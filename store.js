@@ -115,24 +115,45 @@ const FALLBACK = {
 };
 
 /**
- * הנתונים הפעילים: קובץ הקטלוג המפורסם אם הוא נטען, אחרת שלד ההדגמה.
- * כך מה שמופיע בגיטהאב הוא מה שכל מבקר רואה, גם בלי אחסון מקומי.
+ * הנתונים הפעילים, בשלוש שכבות:
+ *   FALLBACK   — השלד. מגדיר כל שדה שהקוד מצפה לו, כולל הגדרות ההזמנה.
+ *   CATALOG_SEED — הקטלוג המפורסם. גובר על השלד בכל מה שהוא מגדיר.
+ *   אחסון מקומי — עריכות מהפאנל. גובר על שניהם.
+ *
+ * הקטלוג חייב להתמזג לתוך השלד ולא להחליף אותו: קטלוג שנוצר לפני
+ * שנוספה תכונה חדשה אינו מכיל את השדות שלה, והחלפה מלאה הייתה
+ * מוחקת אותם ומשביתה את התכונה.
  */
-const SEED = (typeof window !== 'undefined' && window.CATALOG_SEED) || FALLBACK;
+function mergeSettings(base, over) {
+  const s = Object.assign({}, base, over || {});
+  s.checkout = Object.assign({}, base.checkout, (over && over.checkout) || {});
+  return s;
+}
+
+function baseData() {
+  const f = JSON.parse(JSON.stringify(FALLBACK));
+  const pub = (typeof window !== 'undefined' && window.CATALOG_SEED)
+    ? JSON.parse(JSON.stringify(window.CATALOG_SEED)) : null;
+  if (!pub) return f;
+  return {
+    business:    Object.assign(f.business, pub.business || {}),
+    hero:        Object.assign(f.hero,     pub.hero     || {}),
+    pages:       Object.assign(f.pages,    pub.pages    || {}),
+    settings:    mergeSettings(f.settings, pub.settings),
+    departments: Array.isArray(pub.departments) ? pub.departments : f.departments,
+    products:    Array.isArray(pub.products)    ? pub.products    : f.products
+  };
+}
 
 /** מיזוג עם ברירת המחדל, כדי ששדות חדשים לא ישברו נתונים ישנים. */
 function withDefaults(raw) {
-  const d = JSON.parse(JSON.stringify(SEED));
+  const d = baseData();
   if (!raw || typeof raw !== 'object') return d;
   return {
     business:    Object.assign(d.business, raw.business || {}),
     hero:        Object.assign(d.hero,     raw.hero     || {}),
     pages:       Object.assign(d.pages,    raw.pages    || {}),
-    settings:    Object.assign(d.settings, raw.settings || {}, {
-      // מיזוג עמוק לגוש ההזמנה, אחרת הגדרה חדשה תיעלם בנתונים ישנים
-      checkout: Object.assign({}, d.settings.checkout,
-                              (raw.settings && raw.settings.checkout) || {})
-    }),
+    settings:    mergeSettings(d.settings, raw.settings),
     departments: Array.isArray(raw.departments) ? raw.departments : d.departments,
     products:    Array.isArray(raw.products)    ? raw.products    : d.products
   };
@@ -163,7 +184,8 @@ const Store = {
       .sort((a, b) => (a.order || 0) - (b.order || 0));
   },
 
-  uid, SEED,
+  uid,
+  get SEED() { return baseData(); },
   keys: { STORAGE_KEY, GATE_KEY, MOTION_KEY }
 };
 

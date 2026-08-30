@@ -306,7 +306,10 @@ function cartSubmit() {
 
 function initCart(source) {
   siteData = source;
-  if (!siteData.settings.checkout || siteData.settings.checkout.enabled === false) return;
+  // גוש חסר אינו סיבה לכבות את הסל, אלא רק כיבוי מפורש בפאנל
+  siteData.settings.checkout = siteData.settings.checkout || {};
+  if (siteData.settings.checkout.enabled === false) return;
+  if (!document.getElementById('cart-fab')) return;
 
   cartLoad();
   buildForm();
