@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פאנל ניהול — החנות</title>
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script src="data/catalog.js"></script>
+</head>
+
+<body>
+<div class="admin-shell">
+
+  <header class="admin-top">
+    <div class="wrap admin-top__inner">
+      <h1>פאנל ניהול</h1>
+      <div class="admin-top__actions">
+        <a class="btn btn--soft btn--sm" href="index.html">צפייה באתר</a>
+        <button class="btn btn--soft btn--sm" id="act-publish" type="button">ייצוא קובץ אתר</button>
+        <button class="btn btn--soft btn--sm" id="act-export" type="button">ייצוא גיבוי</button>
+        <button class="btn btn--soft btn--sm" id="act-import" type="button">ייבוא גיבוי</button>
+        <input type="file" id="import-file" accept="application/json" hidden>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-notice">
+    <div class="wrap">
+      השינויים נשמרים במכשיר הנוכחי בלבד. כדי שהם יופיעו לכל המבקרים באתר:
+      לוחצים על "ייצוא קובץ אתר", ומחליפים בגיטהאב את הקובץ data/catalog.js
+      בקובץ שירד. הפאנל אינו מנגנון הזדהות ואינו מגן על התוכן.
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <div class="wrap">
+
+      <div class="admin-tabs" role="tablist" aria-label="מקטעי הניהול">
+        <button class="admin-tab" role="tab" id="t-depts"    aria-controls="p-depts"    aria-selected="true"  type="button">מחלקות</button>
+        <button class="admin-tab" role="tab" id="t-products" aria-controls="p-products" aria-selected="false" type="button">מוצרים</button>
+        <button class="admin-tab" role="tab" id="t-content"  aria-controls="p-content"  aria-selected="false" type="button">תוכן ופרטי עסק</button>
+        <button class="admin-tab" role="tab" id="t-settings" aria-controls="p-settings" aria-selected="false" type="button">הגדרות וגיבוי</button>
+      </div>
+
+      <section class="panel" role="tabpanel" id="p-depts" aria-labelledby="t-depts" tabindex="0">
+        <div class="callout">
+          <strong>סימון מחלקת מוצרי עישון</strong>
+          הסימון קובע את תבנית התצוגה באתר. מחלקה מסומנת מוצגת כרשימה יבשה של
+          שם, מחיר וזמינות, בלי אנימציה. שדה התמונה ושדה התיאור נשארים זמינים
+          בפאנל גם במחלקה מסומנת, ומוצגים באתר רק אם תדליק אותם כאן במפורש.
+        </div>
+        <div id="dept-list"></div>
+        <button class="btn" id="act-add-dept" type="button">הוספת מחלקה</button>
+      </section>
+
+      <section class="panel" role="tabpanel" id="p-products" aria-labelledby="t-products" tabindex="0" hidden>
+        <div class="field" style="max-width:420px">
+          <label for="prod-dept">מחלקה</label>
+          <select id="prod-dept"></select>
+        </div>
+        <div id="prod-context"></div>
+        <div id="prod-list"></div>
+        <button class="btn" id="act-add-prod" type="button">הוספת מוצר</button>
+      </section>
+
+      <section class="panel" role="tabpanel" id="p-content" aria-labelledby="t-content" tabindex="0" hidden>
+        <div id="content-form"></div>
+        <button class="btn" id="act-save-content" type="button">שמירת התוכן</button>
+      </section>
+
+      <section class="panel" role="tabpanel" id="p-settings" aria-labelledby="t-settings" tabindex="0" hidden>
+        <div id="settings-form"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn" id="act-save-settings" type="button">שמירת ההגדרות</button>
+          <button class="btn btn--danger" id="act-reset" type="button">איפוס לנתוני ברירת המחדל</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+  <div class="modal__box">
+    <div class="modal__head">
+      <h2 id="modal-title">עריכה</h2>
+      <button class="btn btn--quiet btn--sm" id="modal-close" type="button">סגירה</button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal__foot">
+      <button class="btn" id="modal-save" type="button">שמירה</button>
+      <button class="btn btn--soft" id="modal-cancel" type="button">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>

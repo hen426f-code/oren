@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>החנות</title>
+<meta name="description" content="חנות רב־מחלקתית. הזמנות בוואטסאפ.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+<!-- הקטלוג המפורסם. נטען לפני היישום ומשמש כמקור הנתונים. -->
+<script src="data/catalog.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
+</head>
+
+<body>
+<a class="skip-link" href="#main">דילוג לתוכן המרכזי</a>
+
+<div class="gate" id="age-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
+  <div class="gate__box" id="gate-body">
+    <h2 id="gate-title">אישור גיל</h2>
+    <p>האתר כולל מחלקות של מוצרי טבק ועישון. המכירה בהן אסורה מתחת לגיל 18,
+       ותידרש הצגת תעודה מזהה במעמד המסירה.</p>
+    <div class="gate__actions">
+      <button class="btn" id="gate-yes" type="button">אני מעל גיל 18</button>
+      <button class="btn btn--soft" id="gate-no" type="button">אני מתחת לגיל 18</button>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- מסך הפתיחה: מפיזור לסדר -->
+  <div class="stage" id="hero-stage">
+    <div class="sticky">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-copy">
+        <span class="kicker"><i aria-hidden="true"></i><span id="hero-eyebrow"></span></span>
+        <h1 class="hero-title" id="hero-title"></h1>
+        <p class="hero-lead" id="hero-lead"></p>
+        <div class="hero-actions">
+          <a class="btn" id="hero-cta-1" href="#departments" data-scroll-to="#departments"></a>
+          <a class="btn btn--soft" id="hero-cta-2" href="#" target="_blank" rel="noopener"></a>
+        </div>
+      </div>
+      <p class="cue">גללו כדי לסדר</p>
+    </div>
+  </div>
+
+  <div class="strip"><ul id="strip-track"></ul></div>
+
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="#main">
+        <span class="brand__mark" id="brand-mark" aria-hidden="true">ח</span>
+        <span>
+          <span class="brand__name" id="brand-name">החנות</span>
+          <span class="brand__sub" id="brand-sub"></span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="ניווט ראשי">
+        <a href="#departments" data-scroll-to="#departments">מחלקות</a>
+        <a href="#story" data-scroll-to="#story">איך זה עובד</a>
+        <a href="#info" data-scroll-to="#info">מידע ותקנון</a>
+      </nav>
+      <a class="btn btn--sm btn--dark" href="#departments" data-scroll-to="#departments">לחנות</a>
+    </div>
+  </header>
+
+  <!-- שלושת שלבי הסיפור -->
+  <section class="section" id="story" aria-labelledby="story-title">
+    <div class="wrap">
+      <div class="reveal">
+        <h2 class="section__title" id="story-title">מהמון פריטים לסדר אחד</h2>
+        <p class="section__lead">המבנה נגזר מהמחלקות, והמחלקות נקבעות בפאנל הניהול. אין צורך לגעת בקוד כדי להוסיף, למחוק או לשנות סדר.</p>
+      </div>
+      <div class="story" id="story-list"></div>
+    </div>
+  </section>
+
+  <!-- מחלקות -->
+  <section id="departments" aria-labelledby="departments-title">
+    <div class="section section--tight">
+      <div class="wrap reveal">
+        <h2 class="section__title" id="departments-title">מחלקות</h2>
+        <p class="section__lead">כל מחלקה מוצגת בתבנית שמתאימה לה. מחלקות של מוצרי טבק ועישון מוצגות כרשימת פרטים בסיסיים בלבד.</p>
+      </div>
+    </div>
+
+    <div class="dept-bar">
+      <div class="wrap">
+        <div class="dept-tabs" id="dept-tabs" role="tablist" aria-label="מחלקות החנות"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap" id="dept-panels"></div>
+    </div>
+  </section>
+
+  <!-- מידע -->
+  <section class="section section--paper" id="info" aria-labelledby="info-title">
+    <div class="wrap">
+      <div class="reveal">
+        <h2 class="section__title" id="info-title">על העסק, תקנון ונגישות</h2>
+      </div>
+      <div class="info-grid">
+        <article class="info-card reveal">
+          <h3>על העסק</h3>
+          <p id="page-about"></p>
+          <dl class="biz-facts" id="biz-facts"></dl>
+        </article>
+        <article class="info-card reveal">
+          <h3>מסמכים ומדיניות</h3>
+          <div id="legal-docs"></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>יצירת קשר</h4>
+        <p>הזמנות ובירורים בוואטסאפ: <a id="footer-wa" href="#" target="_blank" rel="noopener"></a></p>
+        <p id="footer-biz"></p>
+      </div>
+      <div>
+        <h4>ניווט</h4>
+        <ul>
+          <li><a href="#departments" data-scroll-to="#departments">מחלקות</a></li>
+          <li><a href="#story" data-scroll-to="#story">איך זה עובד</a></li>
+          <li><a href="#info" data-scroll-to="#info">מידע ותקנון</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>ניהול</h4>
+        <ul><li><a href="admin.html">פאנל ניהול</a></li></ul>
+      </div>
+    </div>
+    <p class="footer-warning" id="footer-warning" hidden></p>
+    <div class="footer-bottom">
+      <span>&copy; <span id="footer-year"></span> כל הזכויות שמורות</span>
+      <span>המכירה של מוצרי טבק ועישון אסורה מתחת לגיל 18</span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-fab" id="wa-fab" href="#" target="_blank" rel="noopener"></a>
+<button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="false">צמצום אנימציות</button>
+
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
