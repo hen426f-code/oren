@@ -375,7 +375,21 @@ button { font-family: inherit; font-size: inherit; }
   padding: var(--s-5) var(--s-6); border-bottom: 1px solid var(--line);
 }
 .cart-panel__head h2 { margin: 0; font-size: 1.4rem; }
-.cart-panel__body { flex: 1; overflow-y: auto; padding: var(--s-5) var(--s-6) var(--s-8); }
+.cart-panel__body {
+  flex: 1; overflow-y: auto;
+  padding: var(--s-5) var(--s-6) var(--s-8);
+  /* בלי זה, גלילה שמגיעה לסוף המגירה ממשיכה אל העמוד שמאחוריה */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* גוף נעול בזמן שחלון צף פתוח. המיקום הקבוע הוא מה שעוצר גלילת מגע. */
+body.is-locked {
+  position: fixed;
+  inset-inline: 0;
+  width: 100%;
+  overflow: hidden;
+}
 
 .cart-empty { color: var(--ink-3); text-align: center; padding-block: var(--s-8); }
 

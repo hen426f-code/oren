@@ -32,6 +32,39 @@ function scrollToTarget(el) {
   else el.scrollIntoView({ block: 'start', behavior: motionReduced() ? 'auto' : 'smooth' });
 }
 
+/* =====================================================================
+   נעילת גלילה לחלונות צפים
+   ---------------------------------------------------------------------
+   שלוש שכבות, כי כל אחת לבדה מפספסת מצב אחר:
+     1. עצירת הגלילה החלקה. היא חוטפת את גלגלת העכבר ומזיזה את העמוד
+        בעצמה, ולכן נעילה דרך overflow אינה משפיעה עליה כלל.
+     2. הקפאת הגוף במיקום קבוע. זה מה שעוצר גלילת מגע, שדפדפנים
+        מסוימים בנייד ממשיכים לבצע גם כשהגוף מוגדר כמוסתר.
+     3. שמירת מיקום הגלילה והחזרתו בשחרור, אחרת העמוד קופץ לראשו.
+   ===================================================================== */
+
+let lockedY = 0;
+
+function lockScroll() {
+  if (document.body.classList.contains('is-locked')) return;
+  lockedY = window.scrollY;
+  if (lenis) lenis.stop();
+  document.body.style.top = (-lockedY) + 'px';
+  document.body.classList.add('is-locked');
+}
+
+function unlockScroll() {
+  if (!document.body.classList.contains('is-locked')) return;
+  document.body.classList.remove('is-locked');
+  document.body.style.top = '';
+  window.scrollTo(0, lockedY);
+  if (lenis) {
+    // מסנכרן את המיקום הפנימי של הספרייה, אחרת היא תקפוץ למקום ישן
+    lenis.scrollTo(lockedY, { immediate: true });
+    lenis.start();
+  }
+}
+
 /** חשיפות בגלילה — התנהגות אחידה לכל האתר, נצפה פעם אחת ומשחרר. */
 function initReveals() {
   const els = document.querySelectorAll('.reveal');
@@ -233,4 +266,5 @@ function initHero(opts) {
   requestAnimationFrame(frame);
 }
 
-export { motionReduced, initScroll, scrollToTarget, initReveals, revealHeadline, initHero };
+export { motionReduced, initScroll, scrollToTarget, initReveals, revealHeadline, initHero,
+         lockScroll, unlockScroll };

@@ -13,6 +13,7 @@
  */
 
 import { Store, money, waLink, esc } from './store.js';
+import { lockScroll, unlockScroll } from './motion.js';
 
 const CART_KEY = 'multistore.cart.v1';
 
@@ -162,14 +163,14 @@ function openCart() {
   lastFocused = document.activeElement;
   const d = document.getElementById('cart-drawer');
   d.hidden = false;
-  document.body.style.overflow = 'hidden';
+  lockScroll();
   cartRefresh();
   document.getElementById('cart-close').focus();
 }
 
 function closeCart() {
   document.getElementById('cart-drawer').hidden = true;
-  document.body.style.overflow = '';
+  unlockScroll();
   if (lastFocused) lastFocused.focus();
 }
 

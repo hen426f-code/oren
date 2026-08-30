@@ -387,7 +387,21 @@ button { font-family: inherit; font-size: inherit; }
   padding: var(--s-5) var(--s-6); border-bottom: 1px solid var(--line);
 }
 .cart-panel__head h2 { margin: 0; font-size: 1.4rem; }
-.cart-panel__body { flex: 1; overflow-y: auto; padding: var(--s-5) var(--s-6) var(--s-8); }
+.cart-panel__body {
+  flex: 1; overflow-y: auto;
+  padding: var(--s-5) var(--s-6) var(--s-8);
+  /* בלי זה, גלילה שמגיעה לסוף המגירה ממשיכה אל העמוד שמאחוריה */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* גוף נעול בזמן שחלון צף פתוח. המיקום הקבוע הוא מה שעוצר גלילת מגע. */
+body.is-locked {
+  position: fixed;
+  inset-inline: 0;
+  width: 100%;
+  overflow: hidden;
+}
 
 .cart-empty { color: var(--ink-3); text-align: center; padding-block: var(--s-8); }
 
@@ -2071,7 +2085,7 @@ window.CATALOG_SEED = {
       <h2 id="cart-title">הסל שלי</h2>
       <button class="btn btn--quiet btn--sm" id="cart-close" type="button">סגירה</button>
     </div>
-    <div class="cart-panel__body">
+    <div class="cart-panel__body" data-lenis-prevent>
       <div id="cart-lines"></div>
       <div id="cart-form" hidden></div>
     </div>
@@ -2338,6 +2352,39 @@ function scrollToTarget(el) {
   else el.scrollIntoView({ block: 'start', behavior: motionReduced() ? 'auto' : 'smooth' });
 }
 
+/* =====================================================================
+   נעילת גלילה לחלונות צפים
+   ---------------------------------------------------------------------
+   שלוש שכבות, כי כל אחת לבדה מפספסת מצב אחר:
+     1. עצירת הגלילה החלקה. היא חוטפת את גלגלת העכבר ומזיזה את העמוד
+        בעצמה, ולכן נעילה דרך overflow אינה משפיעה עליה כלל.
+     2. הקפאת הגוף במיקום קבוע. זה מה שעוצר גלילת מגע, שדפדפנים
+        מסוימים בנייד ממשיכים לבצע גם כשהגוף מוגדר כמוסתר.
+     3. שמירת מיקום הגלילה והחזרתו בשחרור, אחרת העמוד קופץ לראשו.
+   ===================================================================== */
+
+let lockedY = 0;
+
+function lockScroll() {
+  if (document.body.classList.contains('is-locked')) return;
+  lockedY = window.scrollY;
+  if (lenis) lenis.stop();
+  document.body.style.top = (-lockedY) + 'px';
+  document.body.classList.add('is-locked');
+}
+
+function unlockScroll() {
+  if (!document.body.classList.contains('is-locked')) return;
+  document.body.classList.remove('is-locked');
+  document.body.style.top = '';
+  window.scrollTo(0, lockedY);
+  if (lenis) {
+    // מסנכרן את המיקום הפנימי של הספרייה, אחרת היא תקפוץ למקום ישן
+    lenis.scrollTo(lockedY, { immediate: true });
+    lenis.start();
+  }
+}
+
 /** חשיפות בגלילה — התנהגות אחידה לכל האתר, נצפה פעם אחת ומשחרר. */
 function initReveals() {
   const els = document.querySelectorAll('.reveal');
@@ -2553,6 +2600,7 @@ function initHero(opts) {
  *     הלקוח הוא זה ששולח, והעסק מקבל אותה בשיחה רגילה.
  */
 
+
 const CART_KEY = 'multistore.cart.v1';
 
 let siteData = null;
@@ -2701,14 +2749,14 @@ function openCart() {
   lastFocused = document.activeElement;
   const d = document.getElementById('cart-drawer');
   d.hidden = false;
-  document.body.style.overflow = 'hidden';
+  lockScroll();
   cartRefresh();
   document.getElementById('cart-close').focus();
 }
 
 function closeCart() {
   document.getElementById('cart-drawer').hidden = true;
-  document.body.style.overflow = '';
+  unlockScroll();
   if (lastFocused) lastFocused.focus();
 }
 
@@ -3148,13 +3196,13 @@ function initAgeGate() {
   if (!needed || localStorage.getItem(Store.keys.GATE_KEY) === 'ok') { gate.hidden = true; return; }
 
   gate.hidden = false;
-  document.body.style.overflow = 'hidden';
+  lockScroll();
   document.getElementById('gate-yes').focus();
 
   document.getElementById('gate-yes').addEventListener('click', () => {
     localStorage.setItem(Store.keys.GATE_KEY, 'ok');
     gate.hidden = true;
-    document.body.style.overflow = '';
+    unlockScroll();
   });
   document.getElementById('gate-no').addEventListener('click', () => {
     document.getElementById('gate-body').innerHTML =

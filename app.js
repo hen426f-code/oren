@@ -8,7 +8,8 @@
  */
 
 import { Store, money, stockLabel, waLink, esc } from './store.js';
-import { motionReduced, initScroll, scrollToTarget, initReveals, revealHeadline, initHero } from './motion.js';
+import { motionReduced, initScroll, scrollToTarget, initReveals, revealHeadline, initHero,
+         lockScroll, unlockScroll } from './motion.js';
 import { initCart } from './cart.js';
 
 const data  = Store.load();
@@ -274,13 +275,13 @@ function initAgeGate() {
   if (!needed || localStorage.getItem(Store.keys.GATE_KEY) === 'ok') { gate.hidden = true; return; }
 
   gate.hidden = false;
-  document.body.style.overflow = 'hidden';
+  lockScroll();
   document.getElementById('gate-yes').focus();
 
   document.getElementById('gate-yes').addEventListener('click', () => {
     localStorage.setItem(Store.keys.GATE_KEY, 'ok');
     gate.hidden = true;
-    document.body.style.overflow = '';
+    unlockScroll();
   });
   document.getElementById('gate-no').addEventListener('click', () => {
     document.getElementById('gate-body').innerHTML =
