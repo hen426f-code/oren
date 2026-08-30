@@ -45,7 +45,9 @@ function initReveals() {
       e.target.classList.add('is-revealed');
       io.unobserve(e.target);
     });
-  }, { threshold: 0.12 });
+  // סף אפס במקום אחוז: רשימה ארוכה מגובה המסך לעולם לא תגיע לאחוז
+  // הנראות הנדרש, ובסף אחוזי היא נשארת בלתי נראית לצמיתות.
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
   els.forEach(el => io.observe(el));
 }
 

@@ -132,8 +132,11 @@ function selectTab(slug, updateHash) {
   });
   document.querySelectorAll('.dept-panel').forEach(p => { p.hidden = p.id !== 'panel-' + slug; });
   if (updateHash) history.replaceState(null, '', '#' + slug);
-  // הכרטיסים שנחשפו זה עתה צריכים משקיף משלהם
-  initReveals();
+
+  // תוכן שנחשף בלחיצה על לשונית מוצג מיד. משקיף הגלילה אינו נורה על
+  // אלמנט שהיה מוסתר, ובלי השורה הזו הרשימה נשארת בשקיפות אפס.
+  const panel = document.getElementById('panel-' + slug);
+  if (panel) panel.querySelectorAll('.reveal').forEach(el => el.classList.add('is-revealed'));
 }
 
 /* ===================== שתי התבניות ===================== */
@@ -307,6 +310,11 @@ initMotionToggle();
 // קישור עמוק: כתובת עם עוגן פותחת ישירות את המחלקה המבוקשת
 const wanted = location.hash.replace('#', '');
 if (wanted && document.getElementById('panel-' + wanted)) selectTab(wanted, false);
+else {
+  // גם הלשונית הראשונה נחשפת ישירות, כדי שהתוכן לעולם לא יהיה תלוי במשקיף
+  const first = document.querySelector('.dept-panel:not([hidden])');
+  if (first) first.querySelectorAll('.reveal').forEach(el => el.classList.add('is-revealed'));
+}
 
 document.querySelectorAll('[data-scroll-to]').forEach(a => {
   a.addEventListener('click', (e) => {
