@@ -47,11 +47,6 @@ const FALLBACK = {
     ctaSecondary: 'הזמנה בוואטסאפ'
   },
 
-  story: [
-    { num: '01', title: 'הכול מפוזר', text: 'מאות פריטים בלי סדר הם בדיוק מה שמונע מלקוח למצוא את מה שהוא צריך.' },
-    { num: '02', title: 'הכול מתמיין', text: 'כל פריט נכנס למחלקה שלו, ולכל מחלקה יש את התצוגה והכללים שמתאימים לה.' },
-    { num: '03', title: 'הכול נגיש', text: 'המלאי והמחירים מתעדכנים מהפאנל, וההזמנה עוברת ישירות לוואטסאפ.' }
-  ],
 
   pages: {
     about:
@@ -98,7 +93,24 @@ const FALLBACK = {
     smokingWarning: 'אזהרה: העישון מזיק לבריאות ומכיל חומרים ממכרים',
     ageNotice: 'מכירת מוצרי טבק ועישון אסורה מתחת לגיל 18. תידרש הצגת תעודה מזהה במעמד המסירה.',
     vatNotice: 'כל המחירים לצרכן כוללים מס ערך מוסף.',
-    ageGate: true
+    ageGate: true,
+
+    /**
+     * הגדרות ההזמנה. שים לב ל-payLink: זהו קישור תשלום שמונפק על ידי
+     * ספק סליקה מורשה. האתר לעולם אינו אוסף פרטי כרטיס בעצמו.
+     */
+    checkout: {
+      enabled: true,
+      deliveryFee: 20,
+      freeDeliveryFrom: 0,
+      minOrder: 0,
+      pickupAddress: 'הזגג 11, אילת',
+      deliveryAreas: 'אילת והסביבה',
+      payCash: true,
+      payCardOnDelivery: true,
+      payLink: '',
+      payLinkLabel: 'קישור תשלום מאובטח'
+    }
   }
 };
 
@@ -116,8 +128,11 @@ function withDefaults(raw) {
     business:    Object.assign(d.business, raw.business || {}),
     hero:        Object.assign(d.hero,     raw.hero     || {}),
     pages:       Object.assign(d.pages,    raw.pages    || {}),
-    settings:    Object.assign(d.settings, raw.settings || {}),
-    story:       Array.isArray(raw.story)       ? raw.story       : d.story,
+    settings:    Object.assign(d.settings, raw.settings || {}, {
+      // מיזוג עמוק לגוש ההזמנה, אחרת הגדרה חדשה תיעלם בנתונים ישנים
+      checkout: Object.assign({}, d.settings.checkout,
+                              (raw.settings && raw.settings.checkout) || {})
+    }),
     departments: Array.isArray(raw.departments) ? raw.departments : d.departments,
     products:    Array.isArray(raw.products)    ? raw.products    : d.products
   };

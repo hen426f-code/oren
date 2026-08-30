@@ -9,6 +9,7 @@
 
 import { Store, money, stockLabel, waLink, esc } from './store.js';
 import { motionReduced, initScroll, scrollToTarget, initReveals, revealHeadline, initHero } from './motion.js';
+import { initCart } from './cart.js';
 
 const data  = Store.load();
 const depts = Store.sortedDepartments(data);
@@ -34,6 +35,15 @@ function priceMarkup(p) {
     html += '<span class="price__prev">' + esc(money(p.prevPrice)) + '</span>';
   }
   return html + '</span>';
+}
+
+/** כפתור הוספה לסל. מוצר שאזל אינו ניתן להוספה. */
+function addButton(p, plain) {
+  const cls = plain ? 'btn btn--soft btn--sm' : 'btn btn--sm';
+  if (p.stock === 'out') {
+    return '<button class="' + cls + '" type="button" disabled>אזל מהמלאי</button>';
+  }
+  return '<button class="' + cls + '" type="button" data-add="' + esc(p.id) + '">הוספה לסל</button>';
 }
 
 const waIcon =
@@ -67,12 +77,6 @@ function renderShell() {
   const triple = names.concat(names, names);
   document.getElementById('strip-track').innerHTML =
     triple.map(n => '<li>' + esc(n) + '</li>').join('');
-
-  document.getElementById('story-list').innerHTML = data.story.map(s =>
-    '<article class="story__item reveal">' +
-      '<div class="story__num" aria-hidden="true">' + esc(s.num) + '</div>' +
-      '<h3>' + esc(s.title) + '</h3><p>' + esc(s.text) + '</p>' +
-    '</article>').join('');
 }
 
 /* ===================== לשוניות המחלקות ===================== */
@@ -181,8 +185,7 @@ function renderVisual(d, products) {
         (d.showDescriptions !== false && p.description
           ? '<p class="card__desc">' + esc(p.description) + '</p>' : '') +
         '<div class="card__foot">' + priceMarkup(p) + stockMarkup(p.stock) + '</div>' +
-        '<a class="btn btn--sm" href="' + waLink(biz.whatsapp, orderText(d.name, p.name)) +
-        '" target="_blank" rel="noopener">' + waIcon + '<span>הזמנה</span></a>' +
+        addButton(p) +
       '</div></article>';
   }).join('') + '</div>';
 }
@@ -212,7 +215,8 @@ function renderRestricted(d, products) {
     return '<div class="plain-row">' +
       '<div class="plain-row__name">' + esc(p.name) + '</div>' +
       '<div class="plain-row__price">' + esc(money(p.price)) + '</div>' +
-      '<div class="plain-row__stock">' + esc(stockLabel(p.stock)) + '</div>' + extra +
+      '<div class="plain-row__stock">' + esc(stockLabel(p.stock)) + '</div>' +
+      '<div class="plain-row__add">' + addButton(p, true) + '</div>' + extra +
     '</div>';
   }).join('');
 
@@ -329,13 +333,15 @@ revealHeadline(document.getElementById('hero-title'), [
   esc(data.hero.titleC)
 ]);
 
+initCart(data);
 initScroll();
 initReveals();
-initHero(
-  document.getElementById('hero-canvas'),
-  document.getElementById('hero-stage'),
-  document.getElementById('strip-track'),
-  depts.length || 5
-);
+initHero({
+  canvas: document.getElementById('hero-canvas'),
+  stage:  document.getElementById('hero-stage'),
+  track:  document.getElementById('strip-track'),
+  bg:     document.getElementById('bg-layer'),
+  columns: depts.length || 5
+});
 
 if (motionReduced()) document.documentElement.setAttribute('data-motion', 'reduced');

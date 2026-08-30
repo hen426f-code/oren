@@ -20,6 +20,15 @@
 <body>
 <a class="skip-link" href="#main">דילוג לתוכן המרכזי</a>
 
+<!-- שכבת רקע חיה. קבועה מאחורי כל האתר, מונעת מהגלילה. -->
+<div class="bg-layer" id="bg-layer" aria-hidden="true">
+  <span class="bg-orb bg-orb--1"></span>
+  <span class="bg-orb bg-orb--2"></span>
+  <span class="bg-orb bg-orb--3"></span>
+  <span class="bg-orb bg-orb--4"></span>
+  <span class="bg-grid"></span>
+</div>
+
 <div class="gate" id="age-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
   <div class="gate__box" id="gate-body">
     <h2 id="gate-title">אישור גיל</h2>
@@ -64,23 +73,11 @@
       </a>
       <nav class="site-nav" aria-label="ניווט ראשי">
         <a href="#departments" data-scroll-to="#departments">מחלקות</a>
-        <a href="#story" data-scroll-to="#story">איך זה עובד</a>
         <a href="#info" data-scroll-to="#info">מידע ותקנון</a>
       </nav>
       <a class="btn btn--sm btn--dark" href="#departments" data-scroll-to="#departments">לחנות</a>
     </div>
   </header>
-
-  <!-- שלושת שלבי הסיפור -->
-  <section class="section" id="story" aria-labelledby="story-title">
-    <div class="wrap">
-      <div class="reveal">
-        <h2 class="section__title" id="story-title">מהמון פריטים לסדר אחד</h2>
-        <p class="section__lead">המבנה נגזר מהמחלקות, והמחלקות נקבעות בפאנל הניהול. אין צורך לגעת בקוד כדי להוסיף, למחוק או לשנות סדר.</p>
-      </div>
-      <div class="story" id="story-list"></div>
-    </div>
-  </section>
 
   <!-- מחלקות -->
   <section id="departments" aria-labelledby="departments-title">
@@ -136,7 +133,6 @@
         <h4>ניווט</h4>
         <ul>
           <li><a href="#departments" data-scroll-to="#departments">מחלקות</a></li>
-          <li><a href="#story" data-scroll-to="#story">איך זה עובד</a></li>
           <li><a href="#info" data-scroll-to="#info">מידע ותקנון</a></li>
         </ul>
       </div>
@@ -152,6 +148,30 @@
     </div>
   </div>
 </footer>
+
+<!-- סל ההזמנות -->
+<button class="cart-fab" id="cart-fab" type="button" aria-label="פתיחת הסל">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L20.5 8H6"/>
+    <circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/>
+  </svg>
+  <span class="cart-fab__count" id="cart-count" hidden>0</span>
+</button>
+
+<div class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+  <div class="cart-backdrop" id="cart-backdrop"></div>
+  <div class="cart-panel">
+    <div class="cart-panel__head">
+      <h2 id="cart-title">הסל שלי</h2>
+      <button class="btn btn--quiet btn--sm" id="cart-close" type="button">סגירה</button>
+    </div>
+    <div class="cart-panel__body">
+      <div id="cart-lines"></div>
+      <div id="cart-form" hidden></div>
+    </div>
+  </div>
+</div>
+<p class="visually-hidden" id="cart-live" role="status" aria-live="polite"></p>
 
 <a class="wa-fab" id="wa-fab" href="#" target="_blank" rel="noopener"></a>
 <button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="false">צמצום אנימציות</button>

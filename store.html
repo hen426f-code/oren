@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>החנות</title>
+<meta name="description" content="חנות רב־מחלקתית. הזמנות בוואטסאפ.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   מערכת עיצוב — "מפיזור לסדר"
+   רקע בהיר, מבטאי צבע רוויים, פינות עגולות מאוד וגופן עגול כבד.
+   הניגודיות עומדת בתקן הישראלי 5568 ברמה AA.
+   ===================================================================== */
+
+:root {
+  --bg:        #FBFAFF;
+  --paper:     #FFFFFF;
+  --bg-3:      #F4F1FD;
+  --ink:       #1A1626;   /* 15.8 מול הרקע */
+  --ink-2:     #615B75;   /*  6.3 */
+  --ink-3:     #837C99;   /*  4.6 */
+  --line:      #EAE6F5;
+  --line-2:    #D6CFEA;
+
+  --pink:      #F45B9B;
+  --grape:     #7C3AED;
+  --aqua:      #06B6D4;
+  --amber:     #F59E0B;
+  --indigo:    #4F46E5;
+
+  /* גרסאות כהות לשימוש בטקסט, כדי לא לרדת מהניגודיות הנדרשת */
+  --aqua-ink:  #0E7490;
+  --amber-ink: #92600A;
+  --ok:        #0E7490;
+  --ok-soft:   #DFF6FA;
+  --warn:      #B4295F;
+  --warn-soft: #FDEAF2;
+  --focus:     #4F46E5;
+
+  --brand:      linear-gradient(120deg, var(--pink), var(--grape));
+  --brand-text: linear-gradient(96deg, var(--pink), var(--grape) 48%, var(--aqua));
+
+  --font-display: "M PLUS Rounded 1c", Assistant, system-ui, sans-serif;
+  --font-body:    Assistant, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --fs-hero: clamp(3rem, 10.4vw, 7.4rem);
+  --fs-h2:   clamp(2.2rem, 5.6vw, 3.7rem);
+  --fs-h3:   clamp(1.2rem, 2.2vw, 1.4rem);
+  --fs-sm:   0.92rem;
+  --fs-xs:   0.8rem;
+
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px;
+  --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px; --s-9:92px;
+
+  --r:26px; --r-sm:16px; --r-pill:999px;
+
+  --sh-1: 0 8px 24px rgba(26,22,38,.07);
+  --sh-2: 0 28px 58px rgba(26,22,38,.15);
+
+  /* טוקני תנועה — שפה אחת לכל האתר */
+  --ease:      cubic-bezier(.19,1,.22,1);
+  --ease-move: cubic-bezier(.4,0,.2,1);
+  --d-micro: 150ms;
+  --d-base:  280ms;
+  --d-large: 420ms;
+
+  --maxw: 1180px;
+}
+
+/* ===================== בסיס ===================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0; direction: rtl;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); line-height: 1.62;
+  overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display); font-weight: 800;
+  line-height: 1.04; letter-spacing: -.02em; margin: 0 0 var(--s-4);
+}
+p { margin: 0 0 var(--s-4); }
+img { max-width: 100%; display: block; }
+a { color: var(--grape); text-underline-offset: 3px; }
+a:hover { color: var(--ink); }
+button { font-family: inherit; font-size: inherit; }
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px;
+}
+
+.wrap { width: min(100% - var(--s-6) * 2, var(--maxw)); margin-inline: auto; position: relative; z-index: 3; }
+
+.skip-link {
+  position: absolute; inset-inline-start: var(--s-4); top: -100px; z-index: 999;
+  background: var(--ink); color: #fff; padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-sm); text-decoration: none;
+  transition: top var(--d-micro) var(--ease-move);
+}
+.skip-link:focus { top: var(--s-4); color: #fff; }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+
+.grad { background: var(--brand-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ===================== כפתורים ===================== */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: 54px; padding: 14px 32px; border: 0; border-radius: var(--r-pill);
+  font-family: var(--font-display); font-weight: 800; font-size: .98rem;
+  cursor: pointer; text-decoration: none; touch-action: manipulation;
+  background: var(--brand); color: #fff;
+  box-shadow: 0 14px 30px rgba(124,58,237,.3);
+  transition: transform var(--d-base) var(--ease), box-shadow var(--d-base) var(--ease),
+              background var(--d-base) var(--ease), color var(--d-base) var(--ease);
+}
+.btn:hover { transform: translateY(-4px); box-shadow: 0 22px 44px rgba(124,58,237,.38); color: #fff; }
+.btn svg { width: 19px; height: 19px; flex: none; }
+
+.btn--soft   { background: var(--paper); color: var(--ink); border: 1px solid var(--line); box-shadow: var(--sh-1); }
+.btn--soft:hover { color: var(--ink); box-shadow: 0 16px 34px rgba(26,22,38,.13); }
+.btn--dark   { background: var(--ink); box-shadow: 0 12px 26px rgba(26,22,38,.24); }
+.btn--dark:hover { background: var(--grape); }
+.btn--quiet  { background: var(--bg-3); color: var(--ink); box-shadow: none; }
+.btn--quiet:hover { background: var(--line); color: var(--ink); }
+.btn--danger { background: var(--warn-soft); color: var(--warn); box-shadow: none; }
+.btn--danger:hover { background: var(--warn); color: #fff; }
+.btn--sm { min-height: 44px; padding: 9px 22px; font-size: .88rem; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .42; pointer-events: none; }
+
+/* ===================== מסך הפתיחה ===================== */
+
+.stage { height: 270vh; position: relative; }
+.stage--flat { height: auto; }
+
+.sticky {
+  position: sticky; top: 0; height: 100svh; overflow: hidden;
+  display: grid; place-items: center;
+  background:
+    radial-gradient(70% 60% at 78% 12%, rgba(244,91,155,.16), transparent 62%),
+    radial-gradient(60% 60% at 14% 82%, rgba(6,182,212,.16), transparent 62%),
+    var(--bg);
+}
+.stage--flat .sticky { position: static; height: auto; padding-block: var(--s-9); }
+
+#hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+
+.hero-copy { position: relative; z-index: 3; text-align: center; padding-inline: var(--s-5); max-width: 900px; }
+
+.kicker {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 10px 20px; font-weight: 700; font-size: .85rem; color: var(--indigo);
+  margin-bottom: var(--s-5); box-shadow: var(--sh-1);
+}
+.kicker i { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); flex: none; animation: pulse 2.2s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.6); opacity: .4; } }
+
+.hero-title { font-size: var(--fs-hero); margin-bottom: 0; }
+.hero-title span { display: inline-block; opacity: 0; transform: translateY(30px) rotate(3deg); }
+.hero-title.play span { animation: pop .85s var(--ease) forwards; }
+@keyframes pop { to { opacity: 1; transform: none; } }
+
+.hero-lead { color: var(--ink-2); font-size: 1.15rem; max-width: 44ch; margin: var(--s-5) auto var(--s-6); }
+.hero-actions { display: flex; gap: var(--s-3); justify-content: center; flex-wrap: wrap; }
+
+.cue { position: absolute; inset-inline: 0; bottom: var(--s-5); z-index: 4; text-align: center; color: var(--ink-2); font-size: var(--fs-xs); letter-spacing: .16em; }
+
+/* ===================== רצועה נעה ===================== */
+
+.strip { background: var(--ink); color: #fff; overflow: hidden; padding: 15px 0; position: relative; z-index: 3; }
+.strip ul { display: flex; gap: 40px; list-style: none; margin: 0; padding: 0; white-space: nowrap;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; will-change: transform; }
+.strip li::after { content: "✦"; margin-inline-start: 40px; color: var(--pink); }
+
+/* ===================== כותרת עליונה ===================== */
+
+.site-header { position: sticky; top: 0; z-index: 60; background: rgba(251,250,255,.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line); }
+.site-header__inner { display: flex; align-items: center; justify-content: space-between; min-height: 70px; gap: var(--s-4); }
+.brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: var(--ink); }
+.brand__mark { width: 40px; height: 40px; border-radius: 14px; flex: none; display: grid; place-items: center; color: #fff; font-family: var(--font-display); font-weight: 800; background: var(--brand); }
+.brand__name { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; line-height: 1.1; }
+.brand__sub { display: block; font-size: var(--fs-xs); color: var(--ink-3); font-weight: 400; }
+
+.site-nav { display: none; gap: var(--s-5); }
+@media (min-width: 880px) { .site-nav { display: flex; } }
+.site-nav a { color: var(--ink-2); text-decoration: none; font-weight: 700; font-size: .94rem; min-height: 44px; display: inline-flex; align-items: center; }
+.site-nav a:hover { color: var(--grape); }
+
+/* ===================== מקטעים ===================== */
+
+.section { padding-block: var(--s-9); position: relative; z-index: 3; }
+.section--paper { background: var(--paper); }
+.section--tight { padding-block: var(--s-8) var(--s-5); }
+.section__title { font-size: var(--fs-h2); margin-bottom: var(--s-3); }
+.section__lead { color: var(--ink-2); margin: 0 0 var(--s-6); max-width: 52ch; }
+
+.story { display: grid; gap: var(--s-5); }
+@media (min-width: 840px) { .story { grid-template-columns: repeat(3, 1fr); } }
+.story__item { background: var(--paper); border-radius: var(--r); padding: var(--s-6); box-shadow: var(--sh-1); }
+.story__num { font-family: var(--font-display); font-weight: 900; font-size: 2.6rem; line-height: 1; margin-bottom: var(--s-3);
+  background: var(--brand-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.story__item h3 { font-size: var(--fs-h3); }
+.story__item p { color: var(--ink-2); font-size: var(--fs-sm); margin: 0; }
+
+/* ===================== לשוניות מחלקות ===================== */
+
+.dept-bar { position: sticky; top: 70px; z-index: 50; padding-block: var(--s-4); background: linear-gradient(var(--bg) 62%, transparent); }
+.dept-tabs { display: flex; gap: var(--s-2); overflow-x: auto; padding: 6px; background: var(--paper); border-radius: var(--r-pill); box-shadow: var(--sh-1); width: fit-content; max-width: 100%; }
+.dept-tab {
+  flex: none; min-height: 46px; padding: 11px 24px; border: 0; border-radius: var(--r-pill); background: transparent;
+  font-family: var(--font-display); font-weight: 800; font-size: .92rem; color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: background var(--d-base) var(--ease), color var(--d-base) var(--ease);
+}
+.dept-tab:hover { background: var(--bg-3); }
+.dept-tab[aria-selected="true"] { background: var(--brand); color: #fff; }
+.dept-tab__flag { color: var(--amber-ink); margin-inline-start: 6px; font-size: .72rem; }
+.dept-tab[aria-selected="true"] .dept-tab__flag { color: #fff; }
+
+.dept-panel[hidden] { display: none; }
+.dept-head { margin-bottom: var(--s-6); }
+.dept-head h2 { font-size: var(--fs-h2); margin-bottom: var(--s-2); }
+.dept-head p { color: var(--ink-2); max-width: 58ch; margin: 0; }
+
+.legal-warning { border: 3px solid var(--ink); background: var(--paper); border-radius: var(--r); padding: var(--s-5) var(--s-6); margin-bottom: var(--s-6); }
+.legal-warning strong { display: block; font-family: var(--font-display); font-weight: 900; font-size: clamp(1.35rem, 3.6vw, 2.1rem); line-height: 1.16; margin-bottom: var(--s-2); }
+.legal-warning span { display: block; font-size: var(--fs-sm); color: var(--ink-2); }
+
+/* ===================== תבנית ויזואלית ===================== */
+
+.product-grid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); }
+
+.card { position: relative; background: var(--paper); border-radius: var(--r); overflow: hidden;
+  box-shadow: 0 10px 30px rgba(26,22,38,.07); display: flex; flex-direction: column; }
+.card--animated { will-change: transform; transition: transform var(--d-large) var(--ease), box-shadow var(--d-large) var(--ease); }
+.card--animated:hover { transform: translateY(-10px) rotate(-.7deg); box-shadow: var(--sh-2); }
+
+.card__media { aspect-ratio: 4/3; overflow: hidden; background: var(--bg-3); }
+.card__media img { width: 100%; height: 100%; object-fit: cover; }
+.card__media--empty { display: grid; place-items: center; color: #fff; font-weight: 700; font-size: var(--fs-sm); }
+/* שלוש חלופות צבע לכרטיס בלי תמונה, מתחלפות במחזוריות */
+.tone-0 .card__media--empty { background: linear-gradient(140deg, #FB7FB4, #F45B9B); }
+.tone-1 .card__media--empty { background: linear-gradient(140deg, #5EE7F5, #06B6D4); }
+.tone-2 .card__media--empty { background: linear-gradient(140deg, #A78BFA, #7C3AED); }
+
+.card__body { padding: var(--s-5); display: flex; flex-direction: column; gap: 11px; flex: 1; }
+.card__name { font-size: 1.24rem; margin: 0; }
+.card__desc { margin: 0; font-size: var(--fs-sm); color: var(--ink-2); flex: 1; }
+.card__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+
+.price__now { font-family: var(--font-display); font-weight: 800; font-size: 1.36rem; }
+.price__prev { font-size: .89rem; color: var(--ink-3); margin-inline-start: var(--s-2); text-decoration: line-through; }
+.price__vat { font-size: var(--fs-xs); color: var(--ink-3); }
+
+.stock { font-weight: 700; font-size: var(--fs-xs); padding: 5px 13px; border-radius: var(--r-pill); white-space: nowrap; }
+.stock--in  { background: var(--ok-soft); color: var(--ok); }
+.stock--low { background: #FEF3D6; color: var(--amber-ink); }
+.stock--out { background: #F0EEF7; color: var(--ink-2); }
+
+.deal-flag { position: absolute; inset-inline-start: var(--s-4); top: var(--s-4); z-index: 2;
+  background: var(--amber); color: #fff; border-radius: var(--r-pill); padding: 6px 16px;
+  font-family: var(--font-display); font-weight: 800; font-size: .78rem; box-shadow: 0 8px 20px rgba(245,158,11,.4); }
+
+/* ===================== תבנית מוגבלת ===================== */
+
+.plain-list { background: var(--paper); border-radius: var(--r); overflow: hidden; box-shadow: 0 10px 30px rgba(26,22,38,.08); }
+.plain-list__head, .plain-row { display: grid; grid-template-columns: 1fr auto auto; gap: var(--s-5); padding: 18px var(--s-6); align-items: center; }
+.plain-list__head { background: var(--ink); color: #fff; font-weight: 700; font-size: .82rem; }
+.plain-row { border-top: 1px solid var(--line); font-weight: 600; }
+.plain-row__price { font-family: var(--font-display); font-weight: 800; font-size: 1.06rem; white-space: nowrap; }
+.plain-row__stock { font-weight: 400; font-size: .88rem; color: var(--ink-2); white-space: nowrap; }
+.plain-row__extra { grid-column: 1 / -1; }
+.plain-row__extra img { width: 150px; border-radius: var(--r-sm); border: 1px solid var(--line); }
+.plain-row__extra p { margin: 0; font-weight: 400; font-size: var(--fs-sm); color: var(--ink-2); }
+.plain-note { font-size: .85rem; color: var(--ink-2); margin-top: var(--s-4); }
+
+@media (max-width: 560px) {
+  .plain-list__head { display: none; }
+  .plain-row { grid-template-columns: 1fr auto; }
+  .plain-row__stock { grid-column: 1 / -1; }
+}
+
+.dept-order { margin-top: var(--s-6); padding: var(--s-5) var(--s-6); background: var(--bg-3); border-radius: var(--r);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4); }
+.dept-order p { margin: 0; font-size: var(--fs-sm); color: var(--ink-2); }
+
+.empty-state { border: 2px dashed var(--line-2); border-radius: var(--r); padding: var(--s-8) var(--s-5); text-align: center; color: var(--ink-3); }
+
+/* ===================== מידע ===================== */
+
+.info-grid { display: grid; gap: var(--s-5); }
+@media (min-width: 840px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
+.info-card { background: var(--paper); border-radius: var(--r); padding: var(--s-6); box-shadow: var(--sh-1); }
+.info-card h3 { font-size: var(--fs-h3); }
+.info-card p, .info-card li { color: var(--ink-2); font-size: var(--fs-sm); }
+.info-card details { border-top: 1px solid var(--line); padding-top: var(--s-2); }
+.info-card summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+
+.biz-facts { display: grid; gap: var(--s-3); font-size: var(--fs-sm); margin: var(--s-4) 0 0; }
+.biz-facts div { display: flex; gap: var(--s-3); }
+.biz-facts dt { font-weight: 700; min-width: 140px; }
+.biz-facts dd { margin: 0; color: var(--ink-2); }
+
+/* ===================== תחתית ===================== */
+
+.site-footer { background: var(--ink); color: #D9D3EA; padding: var(--s-9) 0 var(--s-6); margin-top: var(--s-8); position: relative; z-index: 3; }
+.site-footer h2, .site-footer h4 { color: #fff; }
+.site-footer a { color: #E7DFF8; }
+.site-footer a:hover { color: #fff; }
+.footer-grid { display: grid; gap: var(--s-6); }
+@media (min-width: 840px) { .footer-grid { grid-template-columns: 1.5fr 1fr 1fr; } }
+.site-footer ul { list-style: none; padding: 0; margin: 0; }
+.site-footer li { margin-bottom: var(--s-2); font-size: var(--fs-sm); }
+.footer-warning { border: 2px solid #3B3550; border-radius: 18px; padding: 20px; margin-top: var(--s-6); font-weight: 700; }
+.footer-bottom { border-top: 1px solid #322C46; margin-top: var(--s-6); padding-top: var(--s-5); font-size: var(--fs-xs); color: #A79FC0;
+  display: flex; flex-wrap: wrap; gap: var(--s-4); justify-content: space-between; }
+
+/* ===================== שער גיל ===================== */
+
+.gate { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: rgba(26,22,38,.6); padding: var(--s-5); }
+.gate[hidden] { display: none; }
+.gate__box { background: var(--paper); border-radius: var(--r); padding: var(--s-7); max-width: 470px; width: 100%; box-shadow: var(--sh-2); text-align: center; }
+.gate__box h2 { font-size: 1.7rem; }
+.gate__box p { color: var(--ink-2); font-size: var(--fs-sm); }
+.gate__actions { display: flex; flex-direction: column; gap: var(--s-3); margin-top: var(--s-5); }
+
+/* ===================== צף וואטסאפ ומתג תנועה ===================== */
+
+.wa-fab { position: fixed; inset-inline-end: var(--s-5); bottom: max(var(--s-5), env(safe-area-inset-bottom));
+  z-index: 70; width: 58px; height: 58px; border-radius: 50%; background: var(--ok); color: #fff;
+  display: grid; place-items: center; box-shadow: 0 14px 32px rgba(14,116,144,.4); text-decoration: none;
+  transition: transform var(--d-base) var(--ease); }
+.wa-fab:hover { transform: translateY(-4px); color: #fff; }
+.wa-fab svg { width: 27px; height: 27px; }
+
+.motion-toggle { position: fixed; inset-inline-start: var(--s-5); bottom: max(var(--s-5), env(safe-area-inset-bottom));
+  z-index: 70; min-height: 44px; padding: 11px 20px; border: 0; border-radius: var(--r-pill);
+  background: var(--ink); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: var(--fs-xs);
+  cursor: pointer; box-shadow: var(--sh-1); }
+.motion-toggle:hover { background: var(--grape); }
+
+
+/* ===================== סל הזמנות ===================== */
+
+.cart-fab {
+  position: fixed; inset-inline-end: var(--s-5);
+  bottom: calc(max(var(--s-5), env(safe-area-inset-bottom)) + 70px);
+  z-index: 71; width: 58px; height: 58px; border-radius: 50%;
+  border: 0; cursor: pointer; background: var(--brand); color: #fff;
+  display: grid; place-items: center; box-shadow: 0 14px 32px rgba(124,58,237,.4);
+  transition: transform var(--d-base) var(--ease);
+}
+.cart-fab:hover { transform: translateY(-4px); }
+.cart-fab svg { width: 26px; height: 26px; }
+.cart-fab__count {
+  position: absolute; inset-inline-start: -4px; top: -4px;
+  min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px;
+  background: var(--amber); color: #fff;
+  font-family: var(--font-display); font-weight: 800; font-size: .78rem;
+  display: grid; place-items: center;
+}
+.cart-fab__count[hidden] { display: none; }
+
+.cart-drawer { position: fixed; inset: 0; z-index: 210; }
+.cart-drawer[hidden] { display: none; }
+.cart-backdrop { position: absolute; inset: 0; background: rgba(26,22,38,.55); }
+.cart-panel {
+  position: absolute; inset-block: 0; inset-inline-start: 0;
+  width: min(100%, 470px); background: var(--paper);
+  display: flex; flex-direction: column; box-shadow: var(--sh-2);
+}
+.cart-panel__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  padding: var(--s-5) var(--s-6); border-bottom: 1px solid var(--line);
+}
+.cart-panel__head h2 { margin: 0; font-size: 1.4rem; }
+.cart-panel__body { flex: 1; overflow-y: auto; padding: var(--s-5) var(--s-6) var(--s-8); }
+
+.cart-empty { color: var(--ink-3); text-align: center; padding-block: var(--s-8); }
+
+.cart-line {
+  display: grid; grid-template-columns: 1fr auto auto;
+  gap: var(--s-3) var(--s-4); align-items: center;
+  padding-block: var(--s-4); border-bottom: 1px solid var(--line);
+}
+.cart-line__main { display: flex; flex-direction: column; }
+.cart-line__name { font-weight: 700; font-size: var(--fs-sm); }
+.cart-line__unit { font-size: var(--fs-xs); color: var(--ink-3); }
+.cart-line__total { font-family: var(--font-display); font-weight: 800; white-space: nowrap; }
+.cart-line__del {
+  grid-column: 1 / -1; justify-self: start;
+  border: 0; background: none; cursor: pointer; padding: 4px 0;
+  font-size: var(--fs-xs); font-weight: 700; color: var(--warn); text-decoration: underline;
+}
+
+.cart-qty { display: flex; align-items: center; gap: var(--s-2); }
+.cart-qty__btn {
+  width: 34px; height: 34px; border: 1.5px solid var(--line-2); border-radius: 10px;
+  background: var(--paper); cursor: pointer; font-size: 1.15rem; line-height: 1;
+  display: grid; place-items: center;
+}
+.cart-qty__btn:hover { background: var(--bg-3); }
+.cart-qty__val { min-width: 24px; text-align: center; font-weight: 700; }
+
+.cart-h { font-size: 1.1rem; margin: var(--s-6) 0 var(--s-3); }
+.cart-choices { display: grid; gap: var(--s-2); grid-template-columns: 1fr 1fr; margin-bottom: var(--s-4); }
+.cart-choices--col { grid-template-columns: 1fr; }
+.cart-choice {
+  display: flex; align-items: flex-start; gap: var(--s-3);
+  padding: var(--s-4); border: 1.5px solid var(--line); border-radius: var(--r-sm);
+  cursor: pointer; font-size: var(--fs-sm); font-weight: 600;
+}
+.cart-choice:has(input:checked) { border-color: var(--grape); background: var(--bg-3); }
+.cart-choice input { width: 20px; height: 20px; flex: none; margin-top: 1px; accent-color: var(--grape); }
+.cart-choice small { display: block; font-weight: 400; color: var(--ink-3); font-size: var(--fs-xs); margin-top: 2px; }
+
+.cart-check {
+  display: flex; align-items: flex-start; gap: var(--s-3);
+  padding: var(--s-3) 0; cursor: pointer; font-size: var(--fs-sm);
+}
+.cart-check input { width: 22px; height: 22px; flex: none; margin-top: 1px; accent-color: var(--grape); }
+
+.cart-total {
+  display: flex; justify-content: space-between; gap: var(--s-4);
+  padding-block: var(--s-2); font-size: var(--fs-sm);
+}
+.cart-total--grand {
+  border-top: 2px solid var(--ink); margin-top: var(--s-2); padding-top: var(--s-3);
+  font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+}
+.cart-note { font-size: var(--fs-xs); color: var(--ink-3); margin: var(--s-3) 0; }
+.cart-warn { font-size: var(--fs-sm); font-weight: 700; color: var(--warn); margin: var(--s-3) 0; }
+.cart-error {
+  background: var(--warn-soft); color: var(--warn); font-weight: 700; font-size: var(--fs-sm);
+  padding: var(--s-3) var(--s-4); border-radius: var(--r-sm); margin: var(--s-3) 0;
+}
+.cart-error[hidden] { display: none; }
+
+#cart-send { width: 100%; margin-top: var(--s-4); }
+#cart-clear { width: 100%; margin-top: var(--s-3); }
+
+/* כפתור ההוספה בשורה של מחלקה מוגבלת — טקסטואלי, בלי הנפשה */
+.plain-row__add { grid-column: 1 / -1; justify-self: start; }
+.plain-row__add .btn { transition: none; }
+.plain-row__add .btn:hover { transform: none; }
+
+/* ===================== שכבת רקע חיה ===================== */
+
+/* קבועה מאחורי כל האתר. רק transform מונפש כאן, כך שהטשטוש היקר
+   מרוסטר פעם אחת והתנועה נשארת על המעבד הגרפי. */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+.bg-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); will-change: transform;
+}
+.bg-orb--1 { width: 46vw; height: 46vw; background: var(--pink);   opacity: .20; inset-inline-end: -8vw;  top: -10vh; }
+.bg-orb--2 { width: 40vw; height: 40vw; background: var(--aqua);   opacity: .18; inset-inline-start: -10vw; top: 30vh; }
+.bg-orb--3 { width: 34vw; height: 34vw; background: var(--grape);  opacity: .16; inset-inline-end: 22vw;  top: 62vh; }
+.bg-orb--4 { width: 28vw; height: 28vw; background: var(--amber);  opacity: .14; inset-inline-start: 26vw; top: 88vh; }
+
+/* רשת נקודות עדינה שנודדת עם הגלילה ומוסיפה תחושת עומק */
+.bg-grid {
+  position: absolute; inset: -20%;
+  background-image: radial-gradient(circle at 1px 1px, rgba(26,22,38,.16) 1px, transparent 0);
+  background-size: 26px 26px;
+  opacity: .5; will-change: transform;
+  -webkit-mask-image: radial-gradient(80% 70% at 50% 40%, #000 30%, transparent 78%);
+          mask-image: radial-gradient(80% 70% at 50% 40%, #000 30%, transparent 78%);
+}
+
+/* התוכן יושב מעל הרקע; המקטעים הצבועים מקבלים שקיפות כדי שייראה מבעדם */
+.section--paper { background: rgba(255,255,255,.72); backdrop-filter: blur(6px); }
+.sticky { background: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-orb, .bg-grid { transform: none !important; }
+}
+body.no-motion .bg-orb, body.no-motion .bg-grid { transform: none !important; }
+
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity .85s var(--ease), transform .85s var(--ease); }
+.reveal.is-revealed { opacity: 1; transform: none; }
+
+/* ===================== צמצום תנועה ===================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .hero-title span { opacity: 1 !important; transform: none !important; }
+  .card--animated:hover { transform: none; }
+  .cue { display: none; }
+}
+body.no-motion .reveal { opacity: 1 !important; transform: none !important; }
+body.no-motion .hero-title span { opacity: 1 !important; transform: none !important; }
+body.no-motion .card--animated:hover { transform: none; }
+body.no-motion .cue { display: none; }
+
+/* =====================================================================
+   פאנל הניהול — אותה שפת עיצוב
+   ===================================================================== */
+
+.admin-shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+.admin-top { background: var(--ink); color: #fff; padding-block: var(--s-4); }
+.admin-top__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); flex-wrap: wrap; }
+.admin-top h1 { color: #fff; font-size: 1.3rem; margin: 0; }
+.admin-top__actions { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+.admin-top .btn--soft { background: transparent; color: #fff; border: 1.5px solid #453E5E; box-shadow: none; }
+.admin-top .btn--soft:hover { background: #2A2440; color: #fff; }
+
+.admin-notice { background: var(--warn-soft); color: #7A1B42; font-size: var(--fs-sm); padding-block: var(--s-3); }
+.admin-body { flex: 1; padding-block: var(--s-6) var(--s-9); }
+
+.admin-tabs { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-bottom: var(--s-6); padding: 6px;
+  background: var(--paper); border-radius: var(--r-pill); box-shadow: var(--sh-1); width: fit-content; max-width: 100%; }
+.admin-tab { min-height: 44px; padding: 10px 22px; border: 0; border-radius: var(--r-pill); background: transparent;
+  font-family: var(--font-display); font-weight: 800; font-size: .9rem; color: var(--ink-2); cursor: pointer;
+  transition: background var(--d-base) var(--ease), color var(--d-base) var(--ease); }
+.admin-tab:hover { background: var(--bg-3); }
+.admin-tab[aria-selected="true"] { background: var(--brand); color: #fff; }
+
+.panel[hidden] { display: none; }
+.panel h2 { font-size: 1.5rem; margin-top: var(--s-6); }
+.panel h2:first-child { margin-top: 0; }
+
+.field { margin-bottom: var(--s-4); }
+.field label { display: block; font-weight: 700; font-size: var(--fs-sm); margin-bottom: var(--s-2); }
+.field .hint { font-size: var(--fs-xs); color: var(--ink-3); margin: var(--s-1) 0 0; }
+.field input, .field select, .field textarea {
+  width: 100%; min-height: 48px; padding: 12px var(--s-4);
+  border: 1.5px solid var(--line-2); border-radius: var(--r-sm);
+  background: var(--paper); color: var(--ink); font-family: inherit; font-size: var(--fs-sm);
+}
+.field textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--focus); }
+
+.check { display: flex; align-items: flex-start; gap: var(--s-3); padding: var(--s-4);
+  border-radius: var(--r-sm); background: var(--paper); box-shadow: var(--sh-1); margin-bottom: var(--s-3); cursor: pointer; }
+.check input { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--grape); }
+.check span { font-size: var(--fs-sm); font-weight: 600; }
+.check small { display: block; color: var(--ink-3); font-size: var(--fs-xs); font-weight: 400; margin-top: 2px; }
+
+.admin-row { display: grid; gap: var(--s-4); align-items: center; padding: var(--s-5);
+  border-radius: var(--r); background: var(--paper); box-shadow: var(--sh-1); margin-bottom: var(--s-3); }
+.admin-row__main { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; }
+.admin-row__title { font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; }
+.admin-row__meta { font-size: var(--fs-xs); color: var(--ink-3); }
+.admin-row__acts { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+
+.tag { font-size: var(--fs-xs); font-weight: 700; padding: 3px 11px; border-radius: var(--r-pill); background: var(--bg-3); color: var(--ink-2); }
+.tag--restricted { background: var(--warn-soft); color: var(--warn); }
+.tag--open { background: var(--ok-soft); color: var(--ok); }
+
+.form-grid { display: grid; gap: var(--s-4); }
+@media (min-width: 720px) { .form-grid--2 { grid-template-columns: 1fr 1fr; } }
+
+.modal { position: fixed; inset: 0; z-index: 300; background: rgba(26,22,38,.6); display: grid; place-items: start center; padding: var(--s-5); overflow-y: auto; }
+.modal[hidden] { display: none; }
+.modal__box { background: var(--paper); border-radius: var(--r); padding: var(--s-6); width: min(100%, 660px); margin-block: var(--s-6); box-shadow: var(--sh-2); }
+.modal__head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-5); }
+.modal__head h2 { margin: 0; font-size: 1.45rem; }
+.modal__foot { display: flex; gap: var(--s-3); margin-top: var(--s-6); flex-wrap: wrap; }
+
+.callout { border-radius: var(--r-sm); padding: var(--s-4) var(--s-5); font-size: var(--fs-sm); margin-bottom: var(--s-5);
+  background: var(--bg-3); border-inline-start: 4px solid var(--grape); }
+.callout--warn { background: var(--warn-soft); border-color: var(--warn); color: #7A1B42; }
+.callout strong { display: block; margin-bottom: var(--s-1); }
+
+.toast { position: fixed; inset-inline-start: 50%; transform: translateX(50%); bottom: var(--s-6); z-index: 400;
+  background: var(--ink); color: #fff; padding: 12px 24px; border-radius: var(--r-pill);
+  font-weight: 700; font-size: var(--fs-sm); box-shadow: var(--sh-2); }
+.toast[hidden] { display: none; }
+
+</style>
+<link rel="icon" href="#" type="image/svg+xml">
+
+<!-- הקטלוג המפורסם. נטען לפני היישום ומשמש כמקור הנתונים. -->
+<script>
+/**
+ * catalog.js — נתוני האתר.
+ *
+ * זהו התוכן שכל מבקר רואה. הוא נטען לפני שאר הקוד ומשמש כבסיס,
+ * ועריכות שנעשות בפאנל הניהול נשמרות מעליו במכשיר המקומי בלבד.
+ * כדי לפרסם עריכה לכל המבקרים: פאנל ניהול, ייצוא קובץ אתר,
+ * ואז החלפת הקובץ הזה במאגר.
+ *
+ * נאסף מדף העסק בוולט.
+ */
+window.CATALOG_SEED = {
+  "business": {
+    "name": "טוי באק",
+    "tagline": "מוצרי עישון · אילת",
+    "legalName": "שם העוסק המלא — למילוי",
+    "businessId": "מספר עוסק או חברה — למילוי",
+    "address": "הזגג 11, אילת 8850713",
+    "whatsapp": "972505335323",
+    "whatsappDisplay": "050-5335323",
+    "hours": "ראשון עד שלישי 08:00–21:45, רביעי וחמישי 08:00–22:45, שישי 08:00–15:15, שבת סגור",
+    "accessibilityOfficer": "שם רכז הנגישות — למילוי",
+    "accessibilityContact": "טלפון או דואר אלקטרוני — למילוי"
+  },
+  "hero": {
+    "eyebrow": "הזמנות בוואטסאפ",
+    "titleA": "המון פריטים.",
+    "titleB": "סדר",
+    "titleC": "אחד.",
+    "lead": "כל מה שיש בחנות, מסודר לפי מחלקות. בוחרים, שולחים הודעה, מקבלים.",
+    "ctaPrimary": "למחלקות החנות",
+    "ctaSecondary": "הזמנה בוואטסאפ"
+  },
+  "pages": {
+    "about": "טוי באק, הזגג 11 אילת. חנות מוצרי עישון ומגוון מוצרים נלווים, עם משלוחים בעיר.",
+    "terms": "תקנון האתר — טיוטה למילוי ולבדיקת עורך דין.",
+    "shipping": "מדיניות משלוחים — אזורי חלוקה, זמני אספקה, עלויות ואופן אימות הגיל במסירה.",
+    "returns": "מדיניות ביטול והחזרה — זכות ביטול בתוך ארבעה עשר יום, בכפוף לחריגים שבחוק הגנת הצרכן.",
+    "privacy": "מדיניות פרטיות — איזה מידע נאסף, לאיזו מטרה, ולמי הוא מועבר.",
+    "accessibility": "הצהרת נגישות — האתר נבנה לפי התקן הישראלי 5568 ברמה AA."
+  },
+  "departments": [
+    {
+      "id": "dep_tobacco",
+      "name": "טבק",
+      "order": 1,
+      "restricted": true,
+      "showImages": true,
+      "showDescriptions": true,
+      "intro": ""
+    },
+    {
+      "id": "dep_cigs",
+      "name": "סיגריות",
+      "order": 2,
+      "restricted": true,
+      "showImages": true,
+      "showDescriptions": true,
+      "intro": ""
+    },
+    {
+      "id": "dep_lighters",
+      "name": "מצתים",
+      "order": 6,
+      "restricted": false,
+      "showImages": true,
+      "showDescriptions": true,
+      "intro": ""
+    }
+  ],
+  "products": [
+    {
+      "id": "prd_tobacco_001",
+      "deptId": "dep_tobacco",
+      "name": "כאמל צהוב | טבק",
+      "price": 101.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb21e896c0fee8a0c76d",
+      "imageAlt": "כאמל צהוב | טבק",
+      "description": "30 גרם",
+      "order": 1
+    },
+    {
+      "id": "prd_tobacco_002",
+      "deptId": "dep_tobacco",
+      "name": "כאמל לייט | טבק",
+      "price": 101.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb33e896c0fee8a0c76e",
+      "imageAlt": "כאמל לייט | טבק",
+      "description": "30 גרם",
+      "order": 2
+    },
+    {
+      "id": "prd_tobacco_003",
+      "deptId": "dep_tobacco",
+      "name": "וינסטון לייט | טבק",
+      "price": 101.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb44e896c0fee8a0c76f",
+      "imageAlt": "וינסטון לייט | טבק",
+      "description": "30 גרם",
+      "order": 3
+    },
+    {
+      "id": "prd_tobacco_004",
+      "deptId": "dep_tobacco",
+      "name": "אמריקן ספיריט כחול",
+      "price": 109.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb5501a83e3323428825",
+      "imageAlt": "אמריקן ספיריט כחול",
+      "description": "30 גרם",
+      "order": 4
+    },
+    {
+      "id": "prd_tobacco_005",
+      "deptId": "dep_tobacco",
+      "name": "גולדן וירגיניה ירוק",
+      "price": 126.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb6501a83e3323428826",
+      "imageAlt": "גולדן וירגיניה ירוק",
+      "description": "40 גרם",
+      "order": 5
+    },
+    {
+      "id": "prd_tobacco_006",
+      "deptId": "dep_tobacco",
+      "name": "גולדן וירגיניה לבן",
+      "price": 94.3,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb7901a83e3323428827",
+      "imageAlt": "גולדן וירגיניה לבן",
+      "description": "30 גרם",
+      "order": 6
+    },
+    {
+      "id": "prd_tobacco_007",
+      "deptId": "dep_tobacco",
+      "name": "טבק מק ברן | שרי",
+      "price": 124.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb89e896c0fee8a0c771",
+      "imageAlt": "טבק מק ברן | שרי",
+      "description": "40 גרם",
+      "order": 7
+    },
+    {
+      "id": "prd_tobacco_008",
+      "deptId": "dep_tobacco",
+      "name": "טבק מק ברן | וניל",
+      "price": 124.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fb99e896c0fee8a0c772",
+      "imageAlt": "טבק מק ברן | וניל",
+      "description": "40 גרם",
+      "order": 8
+    },
+    {
+      "id": "prd_tobacco_009",
+      "deptId": "dep_tobacco",
+      "name": "טבק מק ברן | אורגינל",
+      "price": 124.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fba8e896c0fee8a0c773",
+      "imageAlt": "טבק מק ברן | אורגינל",
+      "description": "40 גרם",
+      "order": 9
+    },
+    {
+      "id": "prd_tobacco_010",
+      "deptId": "dep_tobacco",
+      "name": "טבק מק ברן | ענבים",
+      "price": 124.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fbbb01a83e3323428829",
+      "imageAlt": "טבק מק ברן | ענבים",
+      "description": "40 גרם",
+      "order": 10
+    },
+    {
+      "id": "prd_tobacco_011",
+      "deptId": "dep_tobacco",
+      "name": "טבק מק ברן | תפוח",
+      "price": 124.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fbd701a83e332342882a",
+      "imageAlt": "טבק מק ברן | תפוח",
+      "description": "40 גרם",
+      "order": 11
+    },
+    {
+      "id": "prd_tobacco_012",
+      "deptId": "dep_tobacco",
+      "name": "טבק מק ברן | שוקולד",
+      "price": 124.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fbe901a83e332342882d",
+      "imageAlt": "טבק מק ברן | שוקולד",
+      "description": "40 גרם",
+      "order": 12
+    },
+    {
+      "id": "prd_tobacco_013",
+      "deptId": "dep_tobacco",
+      "name": "באלי שאג | נטורל",
+      "price": 133.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fbf97b7d76e02824b0bc",
+      "imageAlt": "באלי שאג | נטורל",
+      "description": "40 גרם",
+      "order": 13
+    },
+    {
+      "id": "prd_tobacco_014",
+      "deptId": "dep_tobacco",
+      "name": "באלי שאג | לבן",
+      "price": 133.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc0a7b7d76e02824b0bd",
+      "imageAlt": "באלי שאג | לבן",
+      "description": "40 גרם",
+      "order": 14
+    },
+    {
+      "id": "prd_tobacco_015",
+      "deptId": "dep_tobacco",
+      "name": "באלי שאג | סילבר",
+      "price": 133.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc1a7b7d76e02824b0be",
+      "imageAlt": "באלי שאג | סילבר",
+      "description": "40 גרם",
+      "order": 15
+    },
+    {
+      "id": "prd_tobacco_016",
+      "deptId": "dep_tobacco",
+      "name": "באלי שאג | כחול",
+      "price": 133.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc2c7b7d76e02824b0bf",
+      "imageAlt": "באלי שאג | כחול",
+      "description": "40 גרם",
+      "order": 16
+    },
+    {
+      "id": "prd_tobacco_017",
+      "deptId": "dep_tobacco",
+      "name": "באלי שאג | אדום",
+      "price": 133.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc417b7d76e02824b0c0",
+      "imageAlt": "באלי שאג | אדום",
+      "description": "40 גרם",
+      "order": 17
+    },
+    {
+      "id": "prd_tobacco_018",
+      "deptId": "dep_tobacco",
+      "name": "באלי שאג | צהוב",
+      "price": 133.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc517b7d76e02824b0c1",
+      "imageAlt": "באלי שאג | צהוב",
+      "description": "40 גרם",
+      "order": 18
+    },
+    {
+      "id": "prd_tobacco_019",
+      "deptId": "dep_tobacco",
+      "name": "צ'סטרפילד פיין וירגיניה",
+      "price": 86.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc6501a83e332342882e",
+      "imageAlt": "צ'סטרפילד פיין וירגיניה",
+      "description": "30 גרם",
+      "order": 19
+    },
+    {
+      "id": "prd_tobacco_020",
+      "deptId": "dep_tobacco",
+      "name": "צ'סטרפילד אורגינל",
+      "price": 86.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc7301a83e332342882f",
+      "imageAlt": "צ'סטרפילד אורגינל",
+      "description": "30 גרם",
+      "order": 20
+    },
+    {
+      "id": "prd_tobacco_021",
+      "deptId": "dep_tobacco",
+      "name": "טבק פאל מאל כחול",
+      "price": 88.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a91fc8101a83e3323428830",
+      "imageAlt": "טבק פאל מאל כחול",
+      "description": "30 גרם",
+      "order": 21
+    },
+    {
+      "id": "prd_tobacco_022",
+      "deptId": "dep_tobacco",
+      "name": "טבק מניטו ירוק אורגני",
+      "price": 90.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92fe5f01a83e332342979f",
+      "imageAlt": "טבק מניטו ירוק אורגני",
+      "description": "יחידה",
+      "order": 22
+    },
+    {
+      "id": "prd_tobacco_023",
+      "deptId": "dep_tobacco",
+      "name": "טבק מניטו וירג'יניה ורוד",
+      "price": 90.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92fe7401a83e33234297a1",
+      "imageAlt": "טבק מניטו וירג'יניה ורוד",
+      "description": "",
+      "order": 23
+    },
+    {
+      "id": "prd_tobacco_024",
+      "deptId": "dep_tobacco",
+      "name": "טבק מרלבורו אדום",
+      "price": 101.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92fe977b7d76e02824c025",
+      "imageAlt": "טבק מרלבורו אדום",
+      "description": "יחידה",
+      "order": 24
+    },
+    {
+      "id": "prd_tobacco_025",
+      "deptId": "dep_tobacco",
+      "name": "טבק מרלבורו לייט",
+      "price": 101.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92feb43a9b0b41a1d1da90",
+      "imageAlt": "טבק מרלבורו לייט",
+      "description": "יחידה",
+      "order": 25
+    },
+    {
+      "id": "prd_tobacco_026",
+      "deptId": "dep_tobacco",
+      "name": "טבק נקסט פיין",
+      "price": 110.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92fed73a9b0b41a1d1da92",
+      "imageAlt": "טבק נקסט פיין",
+      "description": "יחידה",
+      "order": 26
+    },
+    {
+      "id": "prd_tobacco_027",
+      "deptId": "dep_tobacco",
+      "name": "טבק נקסט אורגינל",
+      "price": 110.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92fef701a83e33234297a6",
+      "imageAlt": "טבק נקסט אורגינל",
+      "description": "יחידה",
+      "order": 27
+    },
+    {
+      "id": "prd_tobacco_028",
+      "deptId": "dep_tobacco",
+      "name": "טבק ווינסטון לבן",
+      "price": 115.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92ff1201a83e33234297a9",
+      "imageAlt": "טבק ווינסטון לבן",
+      "description": "יחידה",
+      "order": 28
+    },
+    {
+      "id": "prd_cigs_001",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו לייט",
+      "price": 48.3,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92ff3501a83e33234297ac",
+      "imageAlt": "מרלבורו לייט",
+      "description": "יחידה",
+      "order": 1
+    },
+    {
+      "id": "prd_cigs_002",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו לייט ארוך",
+      "price": 49.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a92ff4401a83e33234297ad",
+      "imageAlt": "מרלבורו לייט ארוך",
+      "description": "יחידה",
+      "order": 2
+    },
+    {
+      "id": "prd_cigs_003",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו אדום",
+      "price": 48.3,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93009c7b7d76e02824c041",
+      "imageAlt": "מרלבורו אדום",
+      "description": "יחידה",
+      "order": 3
+    },
+    {
+      "id": "prd_cigs_004",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו אדום סופט",
+      "price": 49.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9300b001a83e33234297c5",
+      "imageAlt": "מרלבורו אדום סופט",
+      "description": "יחידה",
+      "order": 4
+    },
+    {
+      "id": "prd_cigs_005",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו טאץ",
+      "price": 43.7,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9300df7b7d76e02824c043",
+      "imageAlt": "מרלבורו טאץ",
+      "description": "יחידה",
+      "order": 5
+    },
+    {
+      "id": "prd_cigs_006",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו פיין טאץ",
+      "price": 44.85,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9300fa7b7d76e02824c044",
+      "imageAlt": "מרלבורו פיין טאץ",
+      "description": "יחידה",
+      "order": 6
+    },
+    {
+      "id": "prd_cigs_007",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו טאץ XL",
+      "price": 44.85,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93011401a83e33234297c8",
+      "imageAlt": "מרלבורו טאץ XL",
+      "description": "יחידה",
+      "order": 7
+    },
+    {
+      "id": "prd_cigs_008",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו פלייבור מיקס",
+      "price": 48.3,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93013601a83e33234297cb",
+      "imageAlt": "מרלבורו פלייבור מיקס",
+      "description": "יחידה",
+      "order": 8
+    },
+    {
+      "id": "prd_cigs_009",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו סאמר ספלש",
+      "price": 42.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9301537b7d76e02824c046",
+      "imageAlt": "מרלבורו סאמר ספלש",
+      "description": "יחידה",
+      "order": 9
+    },
+    {
+      "id": "prd_cigs_010",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו דאבל פיוז'ן",
+      "price": 42.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93016a7b7d76e02824c048",
+      "imageAlt": "מרלבורו דאבל פיוז'ן",
+      "description": "יחידה",
+      "order": 10
+    },
+    {
+      "id": "prd_cigs_011",
+      "deptId": "dep_cigs",
+      "name": "מרלבורו פיוז'ן קפסולה",
+      "price": 42.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9301853a9b0b41a1d1daab",
+      "imageAlt": "מרלבורו פיוז'ן קפסולה",
+      "description": "יחידה",
+      "order": 11
+    },
+    {
+      "id": "prd_cigs_012",
+      "deptId": "dep_cigs",
+      "name": "נקסט פיין לייט",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9301bb01a83e33234297ce",
+      "imageAlt": "נקסט פיין לייט",
+      "description": "יחידה",
+      "order": 12
+    },
+    {
+      "id": "prd_cigs_013",
+      "deptId": "dep_cigs",
+      "name": "נקסט פיין לייט ארוך",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9301f23a9b0b41a1d1dab1",
+      "imageAlt": "נקסט פיין לייט ארוך",
+      "description": "יחידה",
+      "order": 13
+    },
+    {
+      "id": "prd_cigs_014",
+      "deptId": "dep_cigs",
+      "name": "נקסט אורגינל אדום",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314723a9b0b41a1d1dba4",
+      "imageAlt": "נקסט אורגינל אדום",
+      "description": "יחידה",
+      "order": 14
+    },
+    {
+      "id": "prd_cigs_015",
+      "deptId": "dep_cigs",
+      "name": "נקסט ריסס קצר",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314833a9b0b41a1d1dba5",
+      "imageAlt": "נקסט ריסס קצר",
+      "description": "יחידה",
+      "order": 15
+    },
+    {
+      "id": "prd_cigs_016",
+      "deptId": "dep_cigs",
+      "name": "נקסט ריסס ארוך",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314903a9b0b41a1d1dba6",
+      "imageAlt": "נקסט ריסס ארוך",
+      "description": "יחידה",
+      "order": 16
+    },
+    {
+      "id": "prd_cigs_017",
+      "deptId": "dep_cigs",
+      "name": "נקסט אדג'",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314a13a9b0b41a1d1dba7",
+      "imageAlt": "נקסט אדג'",
+      "description": "יחידה",
+      "order": 17
+    },
+    {
+      "id": "prd_cigs_018",
+      "deptId": "dep_cigs",
+      "name": "נקסט פיין אדג'",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314b201a83e332342989f",
+      "imageAlt": "נקסט פיין אדג'",
+      "description": "יחידה",
+      "order": 18
+    },
+    {
+      "id": "prd_cigs_019",
+      "deptId": "dep_cigs",
+      "name": "נקסט לילך",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314c101a83e33234298a4",
+      "imageAlt": "נקסט לילך",
+      "description": "יחידה",
+      "order": 19
+    },
+    {
+      "id": "prd_cigs_020",
+      "deptId": "dep_cigs",
+      "name": "אל אם בלו לייט",
+      "price": 44.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314d101a83e33234298a6",
+      "imageAlt": "אל אם בלו לייט",
+      "description": "יחידה",
+      "order": 20
+    },
+    {
+      "id": "prd_cigs_021",
+      "deptId": "dep_cigs",
+      "name": "אל אם בלו לייט ארוך",
+      "price": 44.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314e57b7d76e02824c140",
+      "imageAlt": "אל אם בלו לייט ארוך",
+      "description": "יחידה",
+      "order": 21
+    },
+    {
+      "id": "prd_cigs_022",
+      "deptId": "dep_cigs",
+      "name": "אל אם אדום",
+      "price": 44.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9314f27b7d76e02824c141",
+      "imageAlt": "אל אם אדום",
+      "description": "יחידה",
+      "order": 22
+    },
+    {
+      "id": "prd_cigs_023",
+      "deptId": "dep_cigs",
+      "name": "אל אם וייב סלימס",
+      "price": 44.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9315017b7d76e02824c143",
+      "imageAlt": "אל אם וייב סלימס",
+      "description": "יחידה",
+      "order": 23
+    },
+    {
+      "id": "prd_cigs_024",
+      "deptId": "dep_cigs",
+      "name": "אל אם קפסולה פורוורד",
+      "price": 44.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93150f7b7d76e02824c148",
+      "imageAlt": "אל אם קפסולה פורוורד",
+      "description": "יחידה",
+      "order": 24
+    },
+    {
+      "id": "prd_cigs_025",
+      "deptId": "dep_cigs",
+      "name": "אל אם קפסולה קליק",
+      "price": 40.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93151b3a9b0b41a1d1dbad",
+      "imageAlt": "אל אם קפסולה קליק",
+      "description": "יחידה",
+      "order": 25
+    },
+    {
+      "id": "prd_cigs_026",
+      "deptId": "dep_cigs",
+      "name": "פרלמנט נייט קצר",
+      "price": 55.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93152b3a9b0b41a1d1dbaf",
+      "imageAlt": "פרלמנט נייט קצר",
+      "description": "יחידה",
+      "order": 26
+    },
+    {
+      "id": "prd_cigs_027",
+      "deptId": "dep_cigs",
+      "name": "פרלמנט נייט ארוך",
+      "price": 55.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9315413a9b0b41a1d1dbb0",
+      "imageAlt": "פרלמנט נייט ארוך",
+      "description": "יחידה",
+      "order": 27
+    },
+    {
+      "id": "prd_cigs_028",
+      "deptId": "dep_cigs",
+      "name": "פרלמנט סילבר",
+      "price": 55.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93154f01a83e33234298ac",
+      "imageAlt": "פרלמנט סילבר",
+      "description": "יחידה",
+      "order": 28
+    },
+    {
+      "id": "prd_cigs_029",
+      "deptId": "dep_cigs",
+      "name": "כאמל צהוב סופט",
+      "price": 44.9,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93155e01a83e33234298b2",
+      "imageAlt": "כאמל צהוב סופט",
+      "description": "יחידה",
+      "order": 29
+    },
+    {
+      "id": "prd_cigs_030",
+      "deptId": "dep_cigs",
+      "name": "כאמל צהוב",
+      "price": 44.9,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9316423a9b0b41a1d1dbbc",
+      "imageAlt": "כאמל צהוב",
+      "description": "יחידה",
+      "order": 30
+    },
+    {
+      "id": "prd_cigs_031",
+      "deptId": "dep_cigs",
+      "name": "כאמל בלו",
+      "price": 44.9,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9316543a9b0b41a1d1dbbe",
+      "imageAlt": "כאמל בלו",
+      "description": "יחידה",
+      "order": 31
+    },
+    {
+      "id": "prd_cigs_032",
+      "deptId": "dep_cigs",
+      "name": "ווינסטון אדום",
+      "price": 47.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9316697b7d76e02824c157",
+      "imageAlt": "ווינסטון אדום",
+      "description": "יחידה",
+      "order": 32
+    },
+    {
+      "id": "prd_cigs_033",
+      "deptId": "dep_cigs",
+      "name": "ווינסטון בלו ארוך",
+      "price": 47.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9316797b7d76e02824c15a",
+      "imageAlt": "ווינסטון בלו ארוך",
+      "description": "יחידה",
+      "order": 33
+    },
+    {
+      "id": "prd_cigs_034",
+      "deptId": "dep_cigs",
+      "name": "קורסט לילך",
+      "price": 36.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9316f501a83e33234298bf",
+      "imageAlt": "קורסט לילך",
+      "description": "יחידה",
+      "order": 34
+    },
+    {
+      "id": "prd_cigs_035",
+      "deptId": "dep_cigs",
+      "name": "קורסט מנטול סלימס",
+      "price": 36.8,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9317063a9b0b41a1d1dbc2",
+      "imageAlt": "קורסט מנטול סלימס",
+      "description": "יחידה",
+      "order": 35
+    },
+    {
+      "id": "prd_cigs_036",
+      "deptId": "dep_cigs",
+      "name": "דוידוף קלאסיק",
+      "price": 46.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9317193a9b0b41a1d1dbc3",
+      "imageAlt": "דוידוף קלאסיק",
+      "description": "יחידה",
+      "order": 36
+    },
+    {
+      "id": "prd_cigs_037",
+      "deptId": "dep_cigs",
+      "name": "אל.די סופר סלימס בלו",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93172a3a9b0b41a1d1dbc5",
+      "imageAlt": "אל.די סופר סלימס בלו",
+      "description": "יחידה",
+      "order": 37
+    },
+    {
+      "id": "prd_cigs_038",
+      "deptId": "dep_cigs",
+      "name": "ווינסטון קומפקט בלו",
+      "price": 40.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93173f7b7d76e02824c160",
+      "imageAlt": "ווינסטון קומפקט בלו",
+      "description": "יחידה",
+      "order": 38
+    },
+    {
+      "id": "prd_cigs_039",
+      "deptId": "dep_cigs",
+      "name": "ווינסטון קומפקט ברי",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9317b601a83e33234298cb",
+      "imageAlt": "ווינסטון קומפקט ברי",
+      "description": "יחידה",
+      "order": 39
+    },
+    {
+      "id": "prd_cigs_040",
+      "deptId": "dep_cigs",
+      "name": "אל.די כחול ארוך",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9317c801a83e33234298ce",
+      "imageAlt": "אל.די כחול ארוך",
+      "description": "יחידה",
+      "order": 40
+    },
+    {
+      "id": "prd_cigs_041",
+      "deptId": "dep_cigs",
+      "name": "אל.די אדום קצר",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9317d801a83e33234298cf",
+      "imageAlt": "אל.די אדום קצר",
+      "description": "יחידה",
+      "order": 41
+    },
+    {
+      "id": "prd_cigs_042",
+      "deptId": "dep_cigs",
+      "name": "אל.די כחול קצר",
+      "price": 41.4,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9317ef01a83e33234298d0",
+      "imageAlt": "אל.די כחול קצר",
+      "description": "יחידה",
+      "order": 42
+    },
+    {
+      "id": "prd_cigs_043",
+      "deptId": "dep_cigs",
+      "name": "אל.די סלימס סגול",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a9317fe01a83e33234298d2",
+      "imageAlt": "אל.די סלימס סגול",
+      "description": "יחידה",
+      "order": 43
+    },
+    {
+      "id": "prd_cigs_044",
+      "deptId": "dep_cigs",
+      "name": "ווינסטון קוד",
+      "price": 43.7,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a93181601a83e33234298d5",
+      "imageAlt": "ווינסטון קוד",
+      "description": "יחידה",
+      "order": 44
+    },
+    {
+      "id": "prd_cigs_045",
+      "deptId": "dep_cigs",
+      "name": "ווינסטון סלימס כחול",
+      "price": 47.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a931a463a9b0b41a1d1dbdd",
+      "imageAlt": "ווינסטון סלימס כחול",
+      "description": "יחידה",
+      "order": 45
+    },
+    {
+      "id": "prd_cigs_046",
+      "deptId": "dep_cigs",
+      "name": "ווינסטון סלימס מנטול",
+      "price": 47.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a931a543a9b0b41a1d1dbde",
+      "imageAlt": "ווינסטון סלימס מנטול",
+      "description": "יחידה",
+      "order": 46
+    },
+    {
+      "id": "prd_cigs_047",
+      "deptId": "dep_cigs",
+      "name": "פאל מאל סופר סלימס ויולט",
+      "price": 43.7,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a931a623a9b0b41a1d1dbdf",
+      "imageAlt": "פאל מאל סופר סלימס ויולט",
+      "description": "יחידה",
+      "order": 47
+    },
+    {
+      "id": "prd_cigs_048",
+      "deptId": "dep_cigs",
+      "name": "פאל מאל דמי מינט",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a931a7001a83e33234298ed",
+      "imageAlt": "פאל מאל דמי מינט",
+      "description": "יחידה",
+      "order": 48
+    },
+    {
+      "id": "prd_cigs_049",
+      "deptId": "dep_cigs",
+      "name": "פאל מאל דמי ברי",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a931a7e01a83e33234298ee",
+      "imageAlt": "פאל מאל דמי ברי",
+      "description": "יחידה",
+      "order": 49
+    },
+    {
+      "id": "prd_cigs_050",
+      "deptId": "dep_cigs",
+      "name": "פאל מאל דמי בלובירי",
+      "price": 39.1,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a931a8d01a83e33234298f0",
+      "imageAlt": "פאל מאל דמי בלובירי",
+      "description": "יחידה",
+      "order": 50
+    },
+    {
+      "id": "prd_lighters_001",
+      "deptId": "dep_lighters",
+      "name": "מצית",
+      "price": 2.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3bc7381699254999dd27d7",
+      "imageAlt": "מצית",
+      "description": "יחידה",
+      "order": 1
+    },
+    {
+      "id": "prd_lighters_002",
+      "deptId": "dep_lighters",
+      "name": "5 מצתים ב-8 שקל",
+      "price": 8.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a426f0eed9a075abfc400f0",
+      "imageAlt": "5 מצתים ב-8 שקל",
+      "description": "5 יחידות",
+      "order": 2
+    },
+    {
+      "id": "prd_lighters_003",
+      "deptId": "dep_lighters",
+      "name": "מצת טורבו ספינר",
+      "price": 5.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3bbde31699254999dd2436",
+      "imageAlt": "מצת טורבו ספינר",
+      "description": "יחידה",
+      "order": 3
+    },
+    {
+      "id": "prd_lighters_004",
+      "deptId": "dep_lighters",
+      "name": "מצית קריקט קטנה",
+      "price": 5.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3ba504c3bb1f158fe9e307",
+      "imageAlt": "מצית קריקט קטנה",
+      "description": "יחידה",
+      "order": 4
+    },
+    {
+      "id": "prd_lighters_005",
+      "deptId": "dep_lighters",
+      "name": "3 מצתי קריקט קטן ב-12.5",
+      "price": 12.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a426f0d087d6ded5520e8ac",
+      "imageAlt": "3 מצתי קריקט קטן ב-12.5",
+      "description": "3 יחידות",
+      "order": 5
+    },
+    {
+      "id": "prd_lighters_006",
+      "deptId": "dep_lighters",
+      "name": "מצת קריקט",
+      "price": 5.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3faf05cdc8c6bbaf6dbffe",
+      "imageAlt": "מצת קריקט",
+      "description": "יחידה",
+      "order": 6
+    },
+    {
+      "id": "prd_lighters_007",
+      "deptId": "dep_lighters",
+      "name": "3 מצתי קריקט גדול ב-12.5",
+      "price": 12.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a426f0eed9a075abfc400ef",
+      "imageAlt": "3 מצתי קריקט גדול ב-12.5",
+      "description": "3 יחידות",
+      "order": 7
+    },
+    {
+      "id": "prd_lighters_008",
+      "deptId": "dep_lighters",
+      "name": "מצת קליפר",
+      "price": 6.2,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3d969f773218380cd618b5",
+      "imageAlt": "מצת קליפר",
+      "description": "יחידה",
+      "order": 8
+    },
+    {
+      "id": "prd_lighters_009",
+      "deptId": "dep_lighters",
+      "name": "3 קליפרים ב-12.5 שקל",
+      "price": 12.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a426f0fed9a075abfc400f1",
+      "imageAlt": "3 קליפרים ב-12.5 שקל",
+      "description": "3 יחידות",
+      "order": 9
+    },
+    {
+      "id": "prd_lighters_010",
+      "deptId": "dep_lighters",
+      "name": "מצית טורבו זהב",
+      "price": 9.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3bcdbc1eb69a0aa2254ec1",
+      "imageAlt": "מצית טורבו זהב",
+      "description": "יחידה",
+      "order": 10
+    },
+    {
+      "id": "prd_lighters_011",
+      "deptId": "dep_lighters",
+      "name": "מצת טורבו גראס",
+      "price": 10.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3bbad5c3bb1f158fe9ef33",
+      "imageAlt": "מצת טורבו גראס",
+      "description": "יחידה",
+      "order": 11
+    },
+    {
+      "id": "prd_lighters_012",
+      "deptId": "dep_lighters",
+      "name": "מצית קליפר ג'ט טורבו",
+      "price": 12.5,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3ba30c1699254999dd124f",
+      "imageAlt": "מצית קליפר ג'ט טורבו",
+      "description": "יחידה",
+      "order": 12
+    },
+    {
+      "id": "prd_lighters_013",
+      "deptId": "dep_lighters",
+      "name": "מצית גז מטבח ארוכה",
+      "price": 16.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3faeb6cdc8c6bbaf6dbfef",
+      "imageAlt": "מצית גז מטבח ארוכה",
+      "description": "יחידה",
+      "order": 13
+    },
+    {
+      "id": "prd_lighters_014",
+      "deptId": "dep_lighters",
+      "name": "מצית מטבח ארוכה מתקפלת",
+      "price": 16.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3faefbcdc8c6bbaf6dbffc",
+      "imageAlt": "מצית מטבח ארוכה מתקפלת",
+      "description": "יחידה",
+      "order": 14
+    },
+    {
+      "id": "prd_lighters_015",
+      "deptId": "dep_lighters",
+      "name": "מצת טורבו 3 להבות",
+      "price": 18.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3bc25ac3bb1f158fe9f305",
+      "imageAlt": "מצת טורבו 3 להבות",
+      "description": "יחידה",
+      "order": 15
+    },
+    {
+      "id": "prd_lighters_016",
+      "deptId": "dep_lighters",
+      "name": "מצת קליפר ברזל טורבו ג'ט, כסוף עם קופסא",
+      "price": 43.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a5541df13b9d66967401941",
+      "imageAlt": "מצת קליפר ברזל טורבו ג'ט, כסוף עם קופסא",
+      "description": "יחידה",
+      "order": 16
+    },
+    {
+      "id": "prd_lighters_017",
+      "deptId": "dep_lighters",
+      "name": "מצית קליפר מתכת בעיצוב גולגולות, עם קופסא",
+      "price": 43.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a3ba21a1eb69a0aa22536a5",
+      "imageAlt": "מצית קליפר מתכת בעיצוב גולגולות, עם קופסא",
+      "description": "יחידה",
+      "order": 17
+    },
+    {
+      "id": "prd_lighters_018",
+      "deptId": "dep_lighters",
+      "name": "מילוי גז מצתים",
+      "price": 16.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a0184cd52a81beed35c9a73",
+      "imageAlt": "מילוי גז מצתים",
+      "description": "יחידה",
+      "order": 18
+    },
+    {
+      "id": "prd_lighters_019",
+      "deptId": "dep_lighters",
+      "name": "דלק זיפו",
+      "price": 21.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a0184cd52a81beed35c9a4f",
+      "imageAlt": "דלק זיפו",
+      "description": "יחידה",
+      "order": 19
+    },
+    {
+      "id": "prd_lighters_020",
+      "deptId": "dep_lighters",
+      "name": "בלון מילוי גז קוליברי",
+      "price": 37.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a436faa9943d1d78ddac8d1",
+      "imageAlt": "בלון מילוי גז קוליברי",
+      "description": "יחידה",
+      "order": 20
+    },
+    {
+      "id": "prd_lighters_021",
+      "deptId": "dep_lighters",
+      "name": "מיכל גז בוטאן לברנר או לכירת גז",
+      "price": 20.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a882416bccbc4de23e08b59",
+      "imageAlt": "מיכל גז בוטאן לברנר או לכירת גז",
+      "description": "יחידה",
+      "order": 21
+    },
+    {
+      "id": "prd_lighters_022",
+      "deptId": "dep_lighters",
+      "name": "מצת טורבו ברנר גדול אקדח AN",
+      "price": 30.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a0184cd52a81beed35c9a77",
+      "imageAlt": "מצת טורבו ברנר גדול אקדח AN",
+      "description": "יחידה",
+      "order": 22
+    },
+    {
+      "id": "prd_lighters_023",
+      "deptId": "dep_lighters",
+      "name": "מצת קוליברי אוו להבה אחת",
+      "price": 345.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a5f1804148de55ae16f0e37",
+      "imageAlt": "מצת קוליברי אוו להבה אחת",
+      "description": "יחידה",
+      "order": 23
+    },
+    {
+      "id": "prd_lighters_024",
+      "deptId": "dep_lighters",
+      "name": "מצת קוליברי אאורה עט",
+      "price": 350.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a5f1e86ca398677dbafd0e1",
+      "imageAlt": "מצת קוליברי אאורה עט",
+      "description": "יחידה",
+      "order": 24
+    },
+    {
+      "id": "prd_lighters_025",
+      "deptId": "dep_lighters",
+      "name": "מצת קוליברי SLIM להבה אחת",
+      "price": 385.0,
+      "prevPrice": null,
+      "stock": "in",
+      "image": "https://imageproxy.wolt.com/assets/6a5f180f148de55ae16f0e38",
+      "imageAlt": "מצת קוליברי SLIM להבה אחת",
+      "description": "יחידה",
+      "order": 25
+    }
+  ],
+  "settings": {
+    "smokingWarning": "אזהרה: העישון מזיק לבריאות ומכיל חומרים ממכרים",
+    "ageNotice": "מכירת מוצרי טבק ועישון אסורה מתחת לגיל 18. תידרש הצגת תעודה מזהה במעמד המסירה.",
+    "vatNotice": "כל המחירים לצרכן כוללים מס ערך מוסף.",
+    "ageGate": true
+  }
+};
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
+</head>
+
+<body>
+<a class="skip-link" href="#main">דילוג לתוכן המרכזי</a>
+
+<!-- שכבת רקע חיה. קבועה מאחורי כל האתר, מונעת מהגלילה. -->
+<div class="bg-layer" id="bg-layer" aria-hidden="true">
+  <span class="bg-orb bg-orb--1"></span>
+  <span class="bg-orb bg-orb--2"></span>
+  <span class="bg-orb bg-orb--3"></span>
+  <span class="bg-orb bg-orb--4"></span>
+  <span class="bg-grid"></span>
+</div>
+
+<div class="gate" id="age-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
+  <div class="gate__box" id="gate-body">
+    <h2 id="gate-title">אישור גיל</h2>
+    <p>האתר כולל מחלקות של מוצרי טבק ועישון. המכירה בהן אסורה מתחת לגיל 18,
+       ותידרש הצגת תעודה מזהה במעמד המסירה.</p>
+    <div class="gate__actions">
+      <button class="btn" id="gate-yes" type="button">אני מעל גיל 18</button>
+      <button class="btn btn--soft" id="gate-no" type="button">אני מתחת לגיל 18</button>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- מסך הפתיחה: מפיזור לסדר -->
+  <div class="stage" id="hero-stage">
+    <div class="sticky">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-copy">
+        <span class="kicker"><i aria-hidden="true"></i><span id="hero-eyebrow"></span></span>
+        <h1 class="hero-title" id="hero-title"></h1>
+        <p class="hero-lead" id="hero-lead"></p>
+        <div class="hero-actions">
+          <a class="btn" id="hero-cta-1" href="#departments" data-scroll-to="#departments"></a>
+          <a class="btn btn--soft" id="hero-cta-2" href="#" target="_blank" rel="noopener"></a>
+        </div>
+      </div>
+      <p class="cue">גללו כדי לסדר</p>
+    </div>
+  </div>
+
+  <div class="strip"><ul id="strip-track"></ul></div>
+
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="#main">
+        <span class="brand__mark" id="brand-mark" aria-hidden="true">ח</span>
+        <span>
+          <span class="brand__name" id="brand-name">החנות</span>
+          <span class="brand__sub" id="brand-sub"></span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="ניווט ראשי">
+        <a href="#departments" data-scroll-to="#departments">מחלקות</a>
+        <a href="#info" data-scroll-to="#info">מידע ותקנון</a>
+      </nav>
+      <a class="btn btn--sm btn--dark" href="#departments" data-scroll-to="#departments">לחנות</a>
+    </div>
+  </header>
+
+  <!-- מחלקות -->
+  <section id="departments" aria-labelledby="departments-title">
+    <div class="section section--tight">
+      <div class="wrap reveal">
+        <h2 class="section__title" id="departments-title">מחלקות</h2>
+        <p class="section__lead">כל מחלקה מוצגת בתבנית שמתאימה לה. מחלקות של מוצרי טבק ועישון מוצגות כרשימת פרטים בסיסיים בלבד.</p>
+      </div>
+    </div>
+
+    <div class="dept-bar">
+      <div class="wrap">
+        <div class="dept-tabs" id="dept-tabs" role="tablist" aria-label="מחלקות החנות"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap" id="dept-panels"></div>
+    </div>
+  </section>
+
+  <!-- מידע -->
+  <section class="section section--paper" id="info" aria-labelledby="info-title">
+    <div class="wrap">
+      <div class="reveal">
+        <h2 class="section__title" id="info-title">על העסק, תקנון ונגישות</h2>
+      </div>
+      <div class="info-grid">
+        <article class="info-card reveal">
+          <h3>על העסק</h3>
+          <p id="page-about"></p>
+          <dl class="biz-facts" id="biz-facts"></dl>
+        </article>
+        <article class="info-card reveal">
+          <h3>מסמכים ומדיניות</h3>
+          <div id="legal-docs"></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>יצירת קשר</h4>
+        <p>הזמנות ובירורים בוואטסאפ: <a id="footer-wa" href="#" target="_blank" rel="noopener"></a></p>
+        <p id="footer-biz"></p>
+      </div>
+      <div>
+        <h4>ניווט</h4>
+        <ul>
+          <li><a href="#departments" data-scroll-to="#departments">מחלקות</a></li>
+          <li><a href="#info" data-scroll-to="#info">מידע ותקנון</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>ניהול</h4>
+        <ul><li><a href="store-admin.html">פאנל ניהול</a></li></ul>
+      </div>
+    </div>
+    <p class="footer-warning" id="footer-warning" hidden></p>
+    <div class="footer-bottom">
+      <span>&copy; <span id="footer-year"></span> כל הזכויות שמורות</span>
+      <span>המכירה של מוצרי טבק ועישון אסורה מתחת לגיל 18</span>
+    </div>
+  </div>
+</footer>
+
+<!-- סל ההזמנות -->
+<button class="cart-fab" id="cart-fab" type="button" aria-label="פתיחת הסל">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L20.5 8H6"/>
+    <circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/>
+  </svg>
+  <span class="cart-fab__count" id="cart-count" hidden>0</span>
+</button>
+
+<div class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+  <div class="cart-backdrop" id="cart-backdrop"></div>
+  <div class="cart-panel">
+    <div class="cart-panel__head">
+      <h2 id="cart-title">הסל שלי</h2>
+      <button class="btn btn--quiet btn--sm" id="cart-close" type="button">סגירה</button>
+    </div>
+    <div class="cart-panel__body">
+      <div id="cart-lines"></div>
+      <div id="cart-form" hidden></div>
+    </div>
+  </div>
+</div>
+<p class="visually-hidden" id="cart-live" role="status" aria-live="polite"></p>
+
+<a class="wa-fab" id="wa-fab" href="#" target="_blank" rel="noopener"></a>
+<button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="false">צמצום אנימציות</button>
+
+<script type="module">
+/**
+ * store.js — שכבת הנתונים המשותפת לאתר ולפאנל הניהול.
+ *
+ * מקור אמת יחיד. אין מחרוזות תוכן קשיחות בקוד התצוגה — הכול נקרא מכאן.
+ * האחסון מקומי בדפדפן. במעבר לשרת מחליפים רק את load ואת save.
+ */
+
+const STORAGE_KEY = 'multistore.data.v1';
+const GATE_KEY    = 'multistore.agegate.v1';
+const MOTION_KEY  = 'multistore.reducedmotion.v1';
+
+/** מזהה קצר וייחודי לרשומה חדשה. */
+function uid(prefix) {
+  return prefix + '_' + Math.random().toString(36).slice(2, 9);
+}
+
+/**
+ * נתוני ברירת המחדל.
+ * restricted        — מחלקת מוצרי עישון. השדה הזה קובע את תבנית התצוגה.
+ * showImages        — מתג ידני להצגת תמונות. במחלקה מוגבלת כבוי כברירת מחדל.
+ * showDescriptions  — מתג ידני להצגת תיאורים. אותו היגיון.
+ *
+ * המבנה שלהלן הוא שלד ההדגמה בלבד. כשקובץ data/catalog.js נטען,
+ * התוכן שבו גובר עליו — ראה FALLBACK בתחתית הקובץ.
+ */
+const FALLBACK = {
+  business: {
+    name: 'החנות',
+    tagline: 'חנות רב־מחלקתית',
+    legalName: 'שם העוסק המלא — למילוי',
+    businessId: 'מספר עוסק או חברה — למילוי',
+    address: 'כתובת העסק — למילוי',
+    whatsapp: '972505335323',
+    whatsappDisplay: '050-5335323',
+    hours: 'ראשון עד חמישי 09:00–19:00, שישי 09:00–14:00',
+    accessibilityOfficer: 'שם רכז הנגישות — למילוי',
+    accessibilityContact: 'טלפון או דואר אלקטרוני של רכז הנגישות — למילוי'
+  },
+
+  hero: {
+    eyebrow: 'הזמנות בוואטסאפ',
+    titleA: 'המון פריטים.',
+    titleB: 'סדר',
+    titleC: 'אחד.',
+    lead: 'המון פריטים, חמש מחלקות, סדר אחד ברור. בוחרים, שולחים הודעה, מקבלים.',
+    ctaPrimary: 'למחלקות החנות',
+    ctaSecondary: 'הזמנה בוואטסאפ'
+  },
+
+
+  pages: {
+    about:
+      'כאן נכתב הטקסט על העסק. מומלץ לתאר מה נמכר, מאיזו שנה העסק פועל, ' +
+      'ואיך מגיעים לחנות הפיזית. אין לכלול בטקסט התייחסות שיווקית למוצרי עישון.',
+    terms:
+      'תקנון האתר — טיוטה למילוי ולבדיקת עורך דין. יש לכלול: פרטי העוסק, ' +
+      'תנאי ההזמנה, מדיניות המחירים, אחריות, סמכות שיפוט ותנאי שימוש.',
+    shipping:
+      'מדיניות משלוחים — אזורי חלוקה, זמני אספקה, עלויות, ואופן אימות הגיל במעמד המסירה.',
+    returns:
+      'מדיניות ביטול והחזרה — זכות ביטול בתוך ארבעה עשר יום ממועד קבלת המוצר או ' +
+      'ממועד קבלת מסמך הפרטים, לפי המאוחר, בכפוף לחריגים שבחוק הגנת הצרכן.',
+    privacy:
+      'מדיניות פרטיות — איזה מידע נאסף, לאיזו מטרה, למי הוא מועבר, וכיצד ניתן ' +
+      'לעיין בו או לבקש את מחיקתו.',
+    accessibility:
+      'הצהרת נגישות — האתר נבנה בהתאם לתקן הישראלי 5568 ברמה AA. ' +
+      'נמצאה תקלת נגישות? נשמח לפנייה אל רכז הנגישות.'
+  },
+
+  departments: [
+    { id: 'dep_deals',  name: 'מבצעי החנות', order: 1, restricted: false, showImages: true,  showDescriptions: true,  intro: 'המבצעים שרצים כרגע בחנות.' },
+    { id: 'dep_acc',    name: 'אקססוריז',    order: 2, restricted: false, showImages: true,  showDescriptions: true,  intro: 'מציתים, קופסאות, מגשים ומוצרים נלווים שאינם מוצרי עישון.' },
+    { id: 'dep_hookah', name: 'נרגילות',     order: 3, restricted: true,  showImages: false, showDescriptions: false, intro: '' },
+    { id: 'dep_tobac',  name: 'מוצרי טבק',   order: 4, restricted: true,  showImages: false, showDescriptions: false, intro: '' },
+    { id: 'dep_smoke',  name: 'מוצרי עישון', order: 5, restricted: true,  showImages: false, showDescriptions: false, intro: '' }
+  ],
+
+  products: [
+    { id: 'prd_1', deptId: 'dep_deals',  name: 'מארז אקססוריז משולב', price: 79,  prevPrice: 99,   stock: 'in',  image: '', imageAlt: '', description: 'מארז המשלב מספר פריטים נלווים.', order: 1 },
+    { id: 'prd_2', deptId: 'dep_deals',  name: 'מארז מתנה',            price: 129, prevPrice: 159,  stock: 'low', image: '', imageAlt: '', description: 'מארז ארוז ומוכן למסירה.',        order: 2 },
+    { id: 'prd_3', deptId: 'dep_acc',    name: 'מצית סופה',            price: 25,  prevPrice: null, stock: 'in',  image: '', imageAlt: '', description: 'מצית עמיד לרוח, ניתן למילוי חוזר.', order: 1 },
+    { id: 'prd_4', deptId: 'dep_acc',    name: 'מגש הגשה מתכת',        price: 45,  prevPrice: null, stock: 'in',  image: '', imageAlt: '', description: 'מגש מתכת בגודל בינוני.',        order: 2 },
+    { id: 'prd_5', deptId: 'dep_acc',    name: 'קופסת אחסון',          price: 38,  prevPrice: null, stock: 'out', image: '', imageAlt: '', description: 'קופסה אטומה עם מכסה מתברג.',    order: 3 },
+    { id: 'prd_6', deptId: 'dep_hookah', name: 'נרגילה דגם א',         price: 320, prevPrice: null, stock: 'in',  image: '', imageAlt: '', description: '', order: 1 },
+    { id: 'prd_7', deptId: 'dep_hookah', name: 'ראש נרגילה חרס',       price: 35,  prevPrice: null, stock: 'in',  image: '', imageAlt: '', description: '', order: 2 },
+    { id: 'prd_8', deptId: 'dep_tobac',  name: 'מוצר טבק לדוגמה א',    price: 40,  prevPrice: null, stock: 'in',  image: '', imageAlt: '', description: '', order: 1 },
+    { id: 'prd_9', deptId: 'dep_tobac',  name: 'מוצר טבק לדוגמה ב',    price: 44,  prevPrice: null, stock: 'out', image: '', imageAlt: '', description: '', order: 2 },
+    { id: 'prd_10', deptId: 'dep_smoke', name: 'מוצר עישון לדוגמה א',  price: 60,  prevPrice: null, stock: 'in',  image: '', imageAlt: '', description: '', order: 1 }
+  ],
+
+  settings: {
+    smokingWarning: 'אזהרה: העישון מזיק לבריאות ומכיל חומרים ממכרים',
+    ageNotice: 'מכירת מוצרי טבק ועישון אסורה מתחת לגיל 18. תידרש הצגת תעודה מזהה במעמד המסירה.',
+    vatNotice: 'כל המחירים לצרכן כוללים מס ערך מוסף.',
+    ageGate: true,
+
+    /**
+     * הגדרות ההזמנה. שים לב ל-payLink: זהו קישור תשלום שמונפק על ידי
+     * ספק סליקה מורשה. האתר לעולם אינו אוסף פרטי כרטיס בעצמו.
+     */
+    checkout: {
+      enabled: true,
+      deliveryFee: 20,
+      freeDeliveryFrom: 0,
+      minOrder: 0,
+      pickupAddress: 'הזגג 11, אילת',
+      deliveryAreas: 'אילת והסביבה',
+      payCash: true,
+      payCardOnDelivery: true,
+      payLink: '',
+      payLinkLabel: 'קישור תשלום מאובטח'
+    }
+  }
+};
+
+/**
+ * הנתונים הפעילים: קובץ הקטלוג המפורסם אם הוא נטען, אחרת שלד ההדגמה.
+ * כך מה שמופיע בגיטהאב הוא מה שכל מבקר רואה, גם בלי אחסון מקומי.
+ */
+const SEED = (typeof window !== 'undefined' && window.CATALOG_SEED) || FALLBACK;
+
+/** מיזוג עם ברירת המחדל, כדי ששדות חדשים לא ישברו נתונים ישנים. */
+function withDefaults(raw) {
+  const d = JSON.parse(JSON.stringify(SEED));
+  if (!raw || typeof raw !== 'object') return d;
+  return {
+    business:    Object.assign(d.business, raw.business || {}),
+    hero:        Object.assign(d.hero,     raw.hero     || {}),
+    pages:       Object.assign(d.pages,    raw.pages    || {}),
+    settings:    Object.assign(d.settings, raw.settings || {}, {
+      // מיזוג עמוק לגוש ההזמנה, אחרת הגדרה חדשה תיעלם בנתונים ישנים
+      checkout: Object.assign({}, d.settings.checkout,
+                              (raw.settings && raw.settings.checkout) || {})
+    }),
+    departments: Array.isArray(raw.departments) ? raw.departments : d.departments,
+    products:    Array.isArray(raw.products)    ? raw.products    : d.products
+  };
+}
+
+const Store = {
+  load() {
+    try {
+      return withDefaults(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+    } catch (e) {
+      console.warn('נתונים שמורים לא תקינים, נטענה ברירת המחדל.', e);
+      return withDefaults(null);
+    }
+  },
+
+  save(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); },
+
+  reset() { localStorage.removeItem(STORAGE_KEY); },
+
+  /** מחלקות לפי סדר התצוגה שנקבע בפאנל. */
+  sortedDepartments(data) {
+    return [...data.departments].sort((a, b) => (a.order || 0) - (b.order || 0));
+  },
+
+  /** מוצרי מחלקה, ממוינים. */
+  productsOf(data, deptId) {
+    return data.products.filter(p => p.deptId === deptId)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  },
+
+  uid, SEED,
+  keys: { STORAGE_KEY, GATE_KEY, MOTION_KEY }
+};
+
+/** תצוגת מחיר בשקלים, בלי שברים מיותרים. */
+function money(value) {
+  const n = Number(value || 0);
+  return n.toLocaleString('he-IL', {
+    style: 'currency', currency: 'ILS',
+    minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2
+  });
+}
+
+/** תווית זמינות אחידה. status הוא in או low או out. */
+function stockLabel(status) {
+  if (status === 'out') return 'אזל מהמלאי';
+  if (status === 'low') return 'מלאי מוגבל';
+  return 'במלאי';
+}
+
+/** קישור הזמנה בוואטסאפ עם טקסט פתיחה. */
+function waLink(number, text) {
+  const clean = String(number || '').replace(/\D/g, '');
+  return 'https://wa.me/' + clean + (text ? '?text=' + encodeURIComponent(text) : '');
+}
+
+/** בריחה מתווי סימון — כל תוכן שמגיע מהפאנל עובר דרך כאן. */
+function esc(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/**
+ * motion.js — שכבת התנועה.
+ *
+ * שלושה כללי יסוד שהקוד כאן מקיים:
+ *  1. לולאת ציור אחת. הגלילה, הקנבס והרצועה מתעדכנים באותו פריים,
+ *     אחרת הם נגררים זה אחרי זה ומרגיש מפורק.
+ *  2. מונפשים רק transform ו-opacity, וציור בקנבס. שום שינוי פריסה.
+ *  3. מסלול צמצום התנועה הוא מסלול ראשי ולא תיקון בסוף: בו הקנבס
+ *     מצויר פעם אחת במצבו הסופי, ואין לולאה בכלל.
+ */
+
+/** האם המשתמש ביקש צמצום אנימציות, במערכת ההפעלה או במתג שבאתר. */
+function motionReduced() {
+  const sys = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const manual = localStorage.getItem('multistore.reducedmotion.v1') === '1';
+  return sys || manual;
+}
+
+let lenis = null;
+
+/** גלילה חלקה, אם הספרייה נטענה. שיפור מדורג בלבד — האתר עובד גם בלעדיה. */
+function initScroll() {
+  if (motionReduced() || typeof Lenis === 'undefined') return null;
+  lenis = new Lenis({ duration: 1.05, smoothWheel: true, syncTouch: false });
+  return lenis;
+}
+
+/** גלילה לעוגן, דרך הספרייה כשהיא פעילה. */
+function scrollToTarget(el) {
+  if (!el) return;
+  if (lenis) lenis.scrollTo(el, { offset: -90 });
+  else el.scrollIntoView({ block: 'start', behavior: motionReduced() ? 'auto' : 'smooth' });
+}
+
+/** חשיפות בגלילה — התנהגות אחידה לכל האתר, נצפה פעם אחת ומשחרר. */
+function initReveals() {
+  const els = document.querySelectorAll('.reveal');
+  if (motionReduced() || !('IntersectionObserver' in window)) {
+    els.forEach(el => el.classList.add('is-revealed'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('is-revealed');
+      io.unobserve(e.target);
+    });
+  // סף אפס במקום אחוז: רשימה ארוכה מגובה המסך לעולם לא תגיע לאחוז
+  // הנראות הנדרש, ובסף אחוזי היא נשארת בלתי נראית לצמיתות.
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+  els.forEach(el => io.observe(el));
+}
+
+/** כותרת שנכנסת מילה־מילה, בדירוג של 85 מילישניות בין מילה למילה. */
+function revealHeadline(el, words) {
+  if (!el) return;
+  el.innerHTML = words
+    .map((w, i) => '<span style="animation-delay:' + (i * 0.085) + 's">' + w + '</span>')
+    .join(' ');
+  if (!motionReduced()) el.classList.add('play');
+}
+
+/* =====================================================================
+   הגיבור — "מפיזור לסדר", בתלת ממד
+   ---------------------------------------------------------------------
+   מצב פתיחה: ענן נקודות מפוזר בחלל, מסתובב לאט. הנקודות הרחוקות קטנות
+   וחיוורות, הקרובות גדולות וברורות — זה מה שיוצר את העומק.
+   מצב סיום: הענן מתיישר למישור אחד שפונה אל הצופה, בעמודות מסודרות,
+   אחת לכל מחלקה, והסיבוב נעצר.
+
+   הגלילה היא שמערבבת בין שני המצבים, ולכן היא זו שמבצעת בפועל את
+   ההבטחה של העסק. הנושא מופשט בכוונה ואינו מוצר עישון ואינו רומז על
+   אחד, כי הנפשה על מוצר עישון עלולה להיחשב פרסומת.
+   ===================================================================== */
+
+function initHero(opts) {
+  const { canvas, stage, track, bg, columns } = opts;
+  if (!canvas || !stage) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) { canvas.style.display = 'none'; return; }
+
+  const reduced = motionReduced();
+  const COLORS = ['#F45B9B', '#7C3AED', '#06B6D4', '#F59E0B', '#4F46E5'];
+  const FOCAL = 900;              // מרחק מוקד: ככל שקטן, הפרספקטיבה חדה יותר
+
+  let W = 0, H = 0, dots = [];
+
+  function build() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    if (!W || !H) return;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const small = W < 720;
+    const cols = Math.max(3, Math.min(columns || 5, small ? 4 : 6));
+    const per  = small ? 8 : 13;
+    const n    = cols * per;
+
+    const gw = Math.min(W * 0.74, 900), colW = gw / cols;
+    const gh = Math.min(H * 0.52, 430), rowH = gh / per;
+
+    dots = Array.from({ length: n }, (_, i) => {
+      const c = i % cols, r = Math.floor(i / cols);
+      return {
+        // מצב הכאוס: מיקום אקראי בתיבה תלת ממדית סביב המרכז
+        x0: (Math.random() - 0.5) * W * 1.5,
+        y0: (Math.random() - 0.5) * H * 1.4,
+        z0: (Math.random() - 0.5) * 900,
+        // מצב הסדר: משבצת ברשת שטוחה, כל עמודה היא מחלקה
+        x1: -gw / 2 + colW * c + colW / 2,
+        y1: -gh / 2 + rowH * r + rowH / 2,
+        z1: 0,
+        r0: (small ? 5 : 7) + Math.random() * (small ? 9 : 14),
+        r1: small ? 5 : 7,
+        color: COLORS[c % COLORS.length],
+        drift: Math.random() * Math.PI * 2,
+        // דירוג של 20 עד 30 מילישניות — נקרא כרצף, לא כתור
+        delay: r * 0.02 + c * 0.03
+      };
+    });
+  }
+
+  /** הטלת נקודה תלת ממדית למסך, אחרי סיבוב סביב שני צירים. */
+  const proj = [];
+  function draw(p, t, pointer) {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+
+    const build01 = Math.min(1, Math.max(0, p));
+    // בכאוס הענן מסובב ומוטה, ובסדר הוא מתיישר אל מול הצופה
+    const spin = reduced ? 0 : t * 0.00011;
+    const ay = (1 - build01) * (0.85 + spin * 6) + pointer.x * 0.28;
+    const ax = (1 - build01) * 0.38 + pointer.y * 0.12;
+    const cosY = Math.cos(ay), sinY = Math.sin(ay);
+    const cosX = Math.cos(ax), sinX = Math.sin(ax);
+    const cx = W / 2, cy = H / 2;
+
+    proj.length = 0;
+    for (const d of dots) {
+      const local = Math.min(1, Math.max(0, (build01 - d.delay) / 0.62));
+      const e = 1 - Math.pow(1 - local, 3);   // האטה קוביתית, לא ליניארי
+      const wob = (1 - e) * 26;               // בכאוס נודדות, בסדר נעצרות
+
+      let x = d.x0 + (d.x1 - d.x0) * e + Math.cos(t * 0.0006 + d.drift) * wob;
+      let y = d.y0 + (d.y1 - d.y0) * e + Math.sin(t * 0.0007 + d.drift) * wob;
+      let z = d.z0 + (d.z1 - d.z0) * e;
+
+      // סיבוב סביב ציר האנך ואז הטיה סביב ציר הרוחב
+      const xr =  x * cosY - z * sinY;
+      let   zr =  x * sinY + z * cosY;
+      const yr =  y * cosX - zr * sinX;
+      zr       =  y * sinX + zr * cosX;
+
+      const s = FOCAL / (FOCAL + zr);          // הפרספקטיבה עצמה
+      if (s <= 0) continue;
+      proj.push({
+        sx: cx + xr * s,
+        sy: cy + yr * s,
+        r: (d.r0 + (d.r1 - d.r0) * e) * s,
+        z: zr,
+        color: d.color,
+        // הרחוקות חיוורות, הקרובות ברורות
+        alpha: Math.max(0.06, Math.min(0.85, (0.2 + e * 0.42) * (0.45 + s * 0.75)))
+      });
+    }
+
+    // ציור מהרחוק אל הקרוב, אחרת הקרובות נבלעות מאחורי הרחוקות
+    proj.sort((a, b) => b.z - a.z);
+    for (const q of proj) {
+      ctx.globalAlpha = q.alpha;
+      ctx.fillStyle = q.color;
+      ctx.beginPath(); ctx.arc(q.sx, q.sy, Math.max(0.5, q.r), 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  build();
+  window.addEventListener('resize', () => { build(); if (reduced) draw(1, 0, { x: 0, y: 0 }); });
+
+  if (reduced) {
+    stage.classList.add('stage--flat');
+    draw(1, 0, { x: 0, y: 0 });
+    return;
+  }
+
+  // מצביע העכבר מטלטל את הענן במעט — עומק בלי להסיח
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  window.addEventListener('pointermove', (e) => {
+    pointer.tx = (e.clientX / window.innerWidth - 0.5) * 2;
+    pointer.ty = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
+
+  const orbs = bg ? [...bg.querySelectorAll('.bg-orb')] : [];
+  const grid = bg ? bg.querySelector('.bg-grid') : null;
+
+  let mqX = 0, lastY = window.scrollY, vel = 0;
+
+  function frame(t) {
+    const y = window.scrollY;
+    vel += ((y - lastY) - vel) * 0.15;   // החלקה של מהירות הגלילה
+    lastY = y;
+
+    pointer.x += (pointer.tx - pointer.x) * 0.055;
+    pointer.y += (pointer.ty - pointer.y) * 0.055;
+
+    const span = stage.offsetHeight - window.innerHeight;
+    const p = span > 0 ? Math.min(1, Math.max(0, y / span)) : 1;
+    draw(p, t, pointer);
+
+    // רקע: כל כתם נע במהירות אחרת, וזה מה שיוצר את הפרלקסה
+    const doc = Math.max(1, document.body.scrollHeight - window.innerHeight);
+    const gp = y / doc;
+    for (let i = 0; i < orbs.length; i++) {
+      const depth = 0.18 + i * 0.14;
+      orbs[i].style.transform =
+        'translate3d(' + (Math.sin(t * 0.00007 + i) * 40) + 'px,' +
+        (-y * depth) + 'px,0) scale(' + (1 + gp * 0.22) + ')';
+    }
+    if (grid) grid.style.transform = 'translate3d(0,' + (-y * 0.08) + 'px,0)';
+
+    if (track) {
+      // הרצועה נעה מעצמה ומאיצה לפי מהירות הגלילה, עם תקרה
+      mqX -= 0.45 + Math.min(6, Math.abs(vel) * 0.08);
+      const loop = track.scrollWidth / 3;
+      if (loop && mqX < -loop) mqX += loop;
+      track.style.transform = 'translate3d(' + mqX + 'px,0,0)';
+    }
+
+    if (lenis) lenis.raf(t);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/**
+ * cart.js — סל הקניות והזמנה.
+ *
+ * שני עקרונות שקובעים את המבנה כאן:
+ *
+ *  1. פרטי כרטיס אשראי אינם נאספים באתר. באתר סטטי אין צד שרת שיכול
+ *     לקבל אותם בבטחה, ואיסוף כזה מפר את תקן PCI. לכן האשראי מוצע
+ *     בשתי דרכים בלבד: תשלום במעמד המסירה או האיסוף, וקישור תשלום
+ *     שמונפק על ידי ספק סליקה מורשה. הקישור נשמר בפאנל ונשלח ללקוח.
+ *
+ *  2. ההזמנה נשלחת כהודעת וואטסאפ מסודרת. אין שרת שיקלוט אותה, ולכן
+ *     הלקוח הוא זה ששולח, והעסק מקבל אותה בשיחה רגילה.
+ */
+
+const CART_KEY = 'multistore.cart.v1';
+
+let siteData = null;
+let cart = {};          // מזהה מוצר אל כמות
+let lastFocused = null;
+
+/* ===================== מצב הסל ===================== */
+
+function cartLoad() {
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || {}; }
+  catch (e) { cart = {}; }
+}
+function cartPersist() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+
+function productById(id) { return siteData.products.find(p => p.id === id); }
+
+/** שורות הסל, מדולגות על מוצרים שנמחקו מהקטלוג בינתיים. */
+function cartLines() {
+  return Object.entries(cart).map(([id, qty]) => {
+    const p = productById(id);
+    return p ? { p, qty, total: Number(p.price) * qty } : null;
+  }).filter(Boolean);
+}
+
+function subtotal() { return cartLines().reduce((s, l) => s + l.total, 0); }
+function cartCount()    { return Object.values(cart).reduce((s, q) => s + q, 0); }
+
+/** דמי משלוח לפי ההגדרות, עם התחשבות בסף למשלוח חינם. */
+function deliveryFee(method) {
+  const c = siteData.settings.checkout;
+  if (method !== 'delivery') return 0;
+  const free = Number(c.freeDeliveryFrom || 0);
+  if (free > 0 && subtotal() >= free) return 0;
+  return Number(c.deliveryFee || 0);
+}
+
+/* ===================== הוספה והסרה ===================== */
+
+function cartAdd(id) {
+  const p = productById(id);
+  if (!p || p.stock === 'out') return;
+  cart[id] = (cart[id] || 0) + 1;
+  cartPersist(); cartRefresh();
+  cartAnnounce(p.name + ' נוסף לסל');
+}
+
+function cartSetQty(id, qty) {
+  if (qty <= 0) delete cart[id];
+  else cart[id] = qty;
+  cartPersist(); cartRefresh();
+}
+
+function cartClear() { cart = {}; cartPersist(); cartRefresh(); }
+
+/** הודעה קולית לקוראי מסך, בלי לשנות את המיקוד. */
+function cartAnnounce(text) {
+  const el = document.getElementById('cart-live');
+  if (el) el.textContent = text;
+}
+
+/* ===================== תצוגת הסל ===================== */
+
+function cartRefresh() {
+  const n = cartCount();
+  const badge = document.getElementById('cart-count');
+  if (badge) {
+    badge.textContent = String(n);
+    badge.hidden = n === 0;
+  }
+  const fab = document.getElementById('cart-fab');
+  if (fab) fab.setAttribute('aria-label', 'פתיחת הסל, ' + n + ' פריטים');
+  renderLines();
+  renderTotals();
+}
+
+function renderLines() {
+  const box = document.getElementById('cart-lines');
+  if (!box) return;
+  const ls = cartLines();
+
+  if (!ls.length) {
+    box.innerHTML = '<p class="cart-empty">הסל ריק. אפשר להוסיף פריטים מהמחלקות.</p>';
+    const form = document.getElementById('cart-form');
+    if (form) form.hidden = true;
+    return;
+  }
+  const form = document.getElementById('cart-form');
+  if (form) form.hidden = false;
+
+  box.innerHTML = ls.map(l =>
+    '<div class="cart-line">' +
+      '<div class="cart-line__main">' +
+        '<span class="cart-line__name">' + esc(l.p.name) + '</span>' +
+        '<span class="cart-line__unit">' + esc(money(l.p.price)) + ' ליחידה</span>' +
+      '</div>' +
+      '<div class="cart-qty">' +
+        '<button type="button" class="cart-qty__btn" data-qty="' + esc(l.p.id) + '|' + (l.qty - 1) +
+        '" aria-label="הפחתת כמות של ' + esc(l.p.name) + '">−</button>' +
+        '<span class="cart-qty__val">' + l.qty + '</span>' +
+        '<button type="button" class="cart-qty__btn" data-qty="' + esc(l.p.id) + '|' + (l.qty + 1) +
+        '" aria-label="הוספת כמות של ' + esc(l.p.name) + '">+</button>' +
+      '</div>' +
+      '<span class="cart-line__total">' + esc(money(l.total)) + '</span>' +
+      '<button type="button" class="cart-line__del" data-qty="' + esc(l.p.id) + '|0"' +
+      ' aria-label="הסרת ' + esc(l.p.name) + ' מהסל">הסרה</button>' +
+    '</div>').join('');
+}
+
+function renderTotals() {
+  const box = document.getElementById('cart-totals');
+  if (!box) return;
+  const c = siteData.settings.checkout;
+  const method = currentMethod();
+  const sub = subtotal();
+  const fee = deliveryFee(method);
+  const min = Number(c.minOrder || 0);
+
+  let html =
+    '<div class="cart-total"><span>סכום הפריטים</span><span>' + esc(money(sub)) + '</span></div>';
+  if (method === 'delivery') {
+    html += '<div class="cart-total"><span>משלוח</span><span>' +
+            (fee === 0 ? 'ללא חיוב' : esc(money(fee))) + '</span></div>';
+  }
+  html += '<div class="cart-total cart-total--grand"><span>לתשלום</span><span>' +
+          esc(money(sub + fee)) + '</span></div>';
+  html += '<p class="cart-note">' + esc(siteData.settings.vatNotice) + '</p>';
+
+  if (min > 0 && sub < min) {
+    html += '<p class="cart-warn">מינימום הזמנה הוא ' + esc(money(min)) +
+            '. חסרים ' + esc(money(min - sub)) + '.</p>';
+  }
+  box.innerHTML = html;
+
+  const send = document.getElementById('cart-send');
+  if (send) send.disabled = (min > 0 && sub < min) || !cartLines().length;
+}
+
+function currentMethod() {
+  const el = document.querySelector('input[name="fulfil"]:checked');
+  return el ? el.value : 'delivery';
+}
+
+/* ===================== המגירה ===================== */
+
+function openCart() {
+  lastFocused = document.activeElement;
+  const d = document.getElementById('cart-drawer');
+  d.hidden = false;
+  document.body.style.overflow = 'hidden';
+  cartRefresh();
+  document.getElementById('cart-close').focus();
+}
+
+function closeCart() {
+  document.getElementById('cart-drawer').hidden = true;
+  document.body.style.overflow = '';
+  if (lastFocused) lastFocused.focus();
+}
+
+/* ===================== בניית טופס ההזמנה ===================== */
+
+function buildForm() {
+  const c = siteData.settings.checkout;
+  const pay = [];
+  if (c.payCash !== false) pay.push(['cash', 'מזומן במעמד המסירה או האיסוף']);
+  if (c.payCardOnDelivery !== false) pay.push(['card_on_site', 'אשראי במעמד המסירה או האיסוף']);
+  if (c.payLink) pay.push(['link', c.payLinkLabel || 'קישור תשלום מאובטח']);
+  if (!pay.length) pay.push(['cash', 'מזומן במעמד המסירה או האיסוף']);
+
+  const form = document.getElementById('cart-form');
+  form.innerHTML =
+    '<h3 class="cart-h">אופן קבלה</h3>' +
+    '<div class="cart-choices">' +
+      '<label class="cart-choice"><input type="radio" name="fulfil" value="delivery" checked>' +
+        '<span>משלוח<small>' + esc(c.deliveryAreas || '') + '</small></span></label>' +
+      '<label class="cart-choice"><input type="radio" name="fulfil" value="pickup">' +
+        '<span>איסוף עצמי<small>' + esc(c.pickupAddress || '') + '</small></span></label>' +
+    '</div>' +
+
+    '<h3 class="cart-h">הפרטים שלך</h3>' +
+    '<div class="field"><label for="ck-name">שם מלא</label><input id="ck-name" type="text" autocomplete="name"></div>' +
+    '<div class="field"><label for="ck-phone">טלפון</label><input id="ck-phone" type="tel" autocomplete="tel" inputmode="tel"></div>' +
+    '<div id="ck-address-wrap">' +
+      '<div class="field"><label for="ck-city">יישוב</label><input id="ck-city" type="text" autocomplete="address-level2"></div>' +
+      '<div class="field"><label for="ck-street">רחוב ומספר</label><input id="ck-street" type="text" autocomplete="street-address"></div>' +
+      '<div class="field"><label for="ck-apt">קומה, דירה וכניסה</label><input id="ck-apt" type="text"></div>' +
+    '</div>' +
+    '<div class="field"><label for="ck-notes">הערות להזמנה</label><textarea id="ck-notes"></textarea></div>' +
+
+    '<h3 class="cart-h">תשלום</h3>' +
+    '<div class="cart-choices cart-choices--col">' +
+      pay.map((o, i) =>
+        '<label class="cart-choice"><input type="radio" name="pay" value="' + esc(o[0]) + '"' +
+        (i === 0 ? ' checked' : '') + '><span>' + esc(o[1]) + '</span></label>').join('') +
+    '</div>' +
+    '<p class="cart-note">האתר אינו אוסף פרטי כרטיס אשראי. תשלום באשראי מתבצע במעמד המסירה או דרך קישור מאובטח של ספק הסליקה.</p>' +
+
+    '<label class="cart-check"><input type="checkbox" id="ck-age">' +
+      '<span>אני מאשר שגילי 18 ומעלה ואציג תעודה מזהה במעמד המסירה</span></label>' +
+    '<label class="cart-check"><input type="checkbox" id="ck-terms">' +
+      '<span>קראתי ואני מסכים לתקנון האתר ולמדיניות הביטול</span></label>' +
+
+    '<div id="cart-totals"></div>' +
+    '<p class="cart-error" id="ck-error" hidden></p>' +
+    '<button class="btn" id="cart-send" type="button">שליחת ההזמנה בוואטסאפ</button>' +
+    '<button class="btn btn--soft btn--sm" id="cart-clear" type="button">ריקון הסל</button>';
+
+  // כתובת נדרשת רק במשלוח
+  form.addEventListener('change', (e) => {
+    if (e.target.name === 'fulfil') {
+      document.getElementById('ck-address-wrap').hidden = e.target.value !== 'delivery';
+      renderTotals();
+    }
+  });
+
+  document.getElementById('cart-send').addEventListener('click', cartSubmit);
+  document.getElementById('cart-clear').addEventListener('click', () => {
+    if (confirm('לרוקן את הסל?')) cartClear();
+  });
+}
+
+/* ===================== שליחה ===================== */
+
+function fail(message, focusId) {
+  const err = document.getElementById('ck-error');
+  err.textContent = message;
+  err.hidden = false;
+  const el = document.getElementById(focusId);
+  if (el) el.focus();
+}
+
+function cartSubmit() {
+  const err = document.getElementById('ck-error');
+  err.hidden = true;
+
+  const method = currentMethod();
+  const name  = document.getElementById('ck-name').value.trim();
+  const phone = document.getElementById('ck-phone').value.trim();
+  const notes = document.getElementById('ck-notes').value.trim();
+
+  if (!name)  return fail('צריך למלא שם מלא', 'ck-name');
+  if (phone.replace(/\D/g, '').length < 9) return fail('צריך למלא מספר טלפון תקין', 'ck-phone');
+
+  let address = '';
+  if (method === 'delivery') {
+    const city   = document.getElementById('ck-city').value.trim();
+    const street = document.getElementById('ck-street').value.trim();
+    const apt    = document.getElementById('ck-apt').value.trim();
+    if (!city)   return fail('צריך למלא יישוב', 'ck-city');
+    if (!street) return fail('צריך למלא רחוב ומספר', 'ck-street');
+    address = street + ', ' + city + (apt ? ' (' + apt + ')' : '');
+  }
+
+  if (!document.getElementById('ck-age').checked)   return fail('צריך לאשר את הצהרת הגיל', 'ck-age');
+  if (!document.getElementById('ck-terms').checked) return fail('צריך לאשר את התקנון', 'ck-terms');
+
+  const ls = cartLines();
+  if (!ls.length) return fail('הסל ריק', 'cart-send');
+
+  const payEl = document.querySelector('input[name="pay"]:checked');
+  const payLabel = payEl ? payEl.parentElement.querySelector('span').childNodes[0].textContent.trim() : '';
+  const c = siteData.settings.checkout;
+  const fee = deliveryFee(method);
+  const sub = subtotal();
+
+  const L = [];
+  L.push('הזמנה חדשה מהאתר');
+  L.push('');
+  L.push('שם: ' + name);
+  L.push('טלפון: ' + phone);
+  L.push(method === 'delivery' ? 'משלוח אל: ' + address
+                               : 'איסוף עצמי מ: ' + (c.pickupAddress || ''));
+  L.push('תשלום: ' + payLabel);
+  if (notes) L.push('הערות: ' + notes);
+  L.push('');
+  L.push('פריטים:');
+  ls.forEach(l => L.push('• ' + l.qty + ' × ' + l.p.name + ' — ' + money(l.total)));
+  L.push('');
+  L.push('סכום הפריטים: ' + money(sub));
+  if (method === 'delivery') L.push('משלוח: ' + (fee === 0 ? 'ללא חיוב' : money(fee)));
+  L.push('לתשלום: ' + money(sub + fee));
+  L.push('');
+  L.push('אישור גיל 18 ואישור תקנון: כן');
+
+  window.open(waLink(siteData.business.whatsapp, L.join('\n')), '_blank', 'noopener');
+  cartAnnounce('ההזמנה נשלחה לוואטסאפ');
+}
+
+/* ===================== חיבור ===================== */
+
+function initCart(source) {
+  siteData = source;
+  if (!siteData.settings.checkout || siteData.settings.checkout.enabled === false) return;
+
+  cartLoad();
+  buildForm();
+
+  document.getElementById('cart-fab').addEventListener('click', openCart);
+  document.getElementById('cart-close').addEventListener('click', closeCart);
+  document.getElementById('cart-backdrop').addEventListener('click', closeCart);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('cart-drawer').hidden) closeCart();
+  });
+
+  // האזנה אחת לכל הכפתורים, כולל כאלה שנוצרו אחרי הטעינה
+  document.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('[data-add]');
+    if (addBtn) { cartAdd(addBtn.dataset.add); return; }
+    const qtyBtn = e.target.closest('[data-qty]');
+    if (qtyBtn) {
+      const [id, q] = qtyBtn.dataset.qty.split('|');
+      cartSetQty(id, Number(q));
+    }
+  });
+
+  cartRefresh();
+}
+
+/**
+ * app.js — הרכבת חזית החנות מתוך הנתונים.
+ *
+ * ההבחנה המרכזית: מחלקה עם restricted מקבלת תבנית אחרת לגמרי —
+ * רשימה טקסטואלית של שם, מחיר וזמינות. בלי תיאור שיווקי, בלי דירוגים,
+ * בלי תגי מבצע ובלי אנימציה על השורה. תמונה ותיאור נשארים אפשריים,
+ * אך רק אם בעל האתר הדליק אותם במפורש בהגדרות אותה מחלקה.
+ */
+
+
+
+const data  = Store.load();
+const depts = Store.sortedDepartments(data);
+const biz   = data.business;
+
+/* ===================== עזרי סימון ===================== */
+
+function orderText(deptName, productName) {
+  let t = 'שלום, אשמח להזמין';
+  if (productName) t += ': ' + productName;
+  if (deptName) t += ' (' + deptName + ')';
+  return t;
+}
+
+function stockMarkup(status) {
+  const cls = status === 'out' ? 'out' : status === 'low' ? 'low' : 'in';
+  return '<span class="stock stock--' + cls + '">' + esc(stockLabel(status)) + '</span>';
+}
+
+function priceMarkup(p) {
+  let html = '<span><span class="price__now">' + esc(money(p.price)) + '</span>';
+  if (p.prevPrice && Number(p.prevPrice) > Number(p.price)) {
+    html += '<span class="price__prev">' + esc(money(p.prevPrice)) + '</span>';
+  }
+  return html + '</span>';
+}
+
+/** כפתור הוספה לסל. מוצר שאזל אינו ניתן להוספה. */
+function addButton(p, plain) {
+  const cls = plain ? 'btn btn--soft btn--sm' : 'btn btn--sm';
+  if (p.stock === 'out') {
+    return '<button class="' + cls + '" type="button" disabled>אזל מהמלאי</button>';
+  }
+  return '<button class="' + cls + '" type="button" data-add="' + esc(p.id) + '">הוספה לסל</button>';
+}
+
+const waIcon =
+  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+  '<path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.17c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>';
+
+/* ===================== מעטפת ===================== */
+
+function renderShell() {
+  document.title = biz.name + ' — ' + biz.tagline;
+
+  document.getElementById('brand-mark').textContent = (biz.name.trim().charAt(0) || 'ח');
+  document.getElementById('brand-name').textContent = biz.name;
+  document.getElementById('brand-sub').textContent  = biz.tagline;
+
+  document.getElementById('hero-eyebrow').textContent =
+    data.hero.eyebrow + ' · ' + biz.whatsappDisplay;
+  document.getElementById('hero-lead').textContent = data.hero.lead;
+  document.getElementById('hero-cta-1').textContent = data.hero.ctaPrimary;
+
+  const cta2 = document.getElementById('hero-cta-2');
+  cta2.href = waLink(biz.whatsapp, orderText());
+  cta2.innerHTML = waIcon + '<span>' + esc(data.hero.ctaSecondary) + '</span>';
+
+  const fab = document.getElementById('wa-fab');
+  fab.href = waLink(biz.whatsapp, orderText());
+  fab.innerHTML = waIcon + '<span class="visually-hidden">פתיחת שיחה בוואטסאפ</span>';
+
+  // הרצועה מכילה את הרשימה שלוש פעמים, כדי שהלולאה תהיה רציפה
+  const names = depts.map(d => d.name);
+  const triple = names.concat(names, names);
+  document.getElementById('strip-track').innerHTML =
+    triple.map(n => '<li>' + esc(n) + '</li>').join('');
+}
+
+/* ===================== לשוניות המחלקות ===================== */
+
+/** עוגן יציב, נגזר מהמזהה כדי שקישור עמוק לא ישבר בשינוי שם המחלקה. */
+function slugOf(d) { return d.id.replace(/[^a-z0-9_-]/gi, ''); }
+
+function renderTabs() {
+  const tabsEl = document.getElementById('dept-tabs');
+  const panelsEl = document.getElementById('dept-panels');
+
+  if (!depts.length) {
+    tabsEl.innerHTML = '';
+    panelsEl.innerHTML = '<div class="empty-state">עדיין לא הוגדרו מחלקות. אפשר להוסיף אותן בפאנל הניהול.</div>';
+    return;
+  }
+
+  tabsEl.innerHTML = depts.map((d, i) =>
+    '<button class="dept-tab" role="tab" type="button" id="tab-' + slugOf(d) + '"' +
+    ' aria-controls="panel-' + slugOf(d) + '" aria-selected="' + (i === 0) + '"' +
+    ' tabindex="' + (i === 0 ? 0 : -1) + '">' + esc(d.name) +
+    (d.restricted ? '<span class="dept-tab__flag">18+</span>' : '') + '</button>').join('');
+
+  panelsEl.innerHTML = depts.map((d, i) =>
+    '<section class="dept-panel" role="tabpanel" id="panel-' + slugOf(d) + '"' +
+    ' aria-labelledby="tab-' + slugOf(d) + '" tabindex="0"' + (i === 0 ? '' : ' hidden') + '>' +
+    renderDept(d) + '</section>').join('');
+
+  tabsEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.dept-tab');
+    if (btn) selectTab(btn.id.replace('tab-', ''), true);
+  });
+
+  // ניווט מקלדת לפי דפוס ה-tablist המקובל. בממשק מימין לשמאל,
+  // חץ שמאלה מתקדם קדימה ברשימה.
+  tabsEl.addEventListener('keydown', (e) => {
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+    e.preventDefault();
+    const all = [...tabsEl.querySelectorAll('.dept-tab')];
+    const cur = all.findIndex(b => b.getAttribute('aria-selected') === 'true');
+    let next = cur;
+    if (e.key === 'ArrowLeft')  next = (cur + 1) % all.length;
+    if (e.key === 'ArrowRight') next = (cur - 1 + all.length) % all.length;
+    if (e.key === 'Home') next = 0;
+    if (e.key === 'End')  next = all.length - 1;
+    const id = all[next].id.replace('tab-', '');
+    selectTab(id, true);
+    document.getElementById('tab-' + id).focus();
+  });
+}
+
+function selectTab(slug, updateHash) {
+  document.querySelectorAll('.dept-tab').forEach(b => {
+    const on = b.id === 'tab-' + slug;
+    b.setAttribute('aria-selected', String(on));
+    b.tabIndex = on ? 0 : -1;
+  });
+  document.querySelectorAll('.dept-panel').forEach(p => { p.hidden = p.id !== 'panel-' + slug; });
+  if (updateHash) history.replaceState(null, '', '#' + slug);
+
+  // תוכן שנחשף בלחיצה על לשונית מוצג מיד. משקיף הגלילה אינו נורה על
+  // אלמנט שהיה מוסתר, ובלי השורה הזו הרשימה נשארת בשקיפות אפס.
+  const panel = document.getElementById('panel-' + slug);
+  if (panel) panel.querySelectorAll('.reveal').forEach(el => el.classList.add('is-revealed'));
+}
+
+/* ===================== שתי התבניות ===================== */
+
+function renderDept(d) {
+  const products = Store.productsOf(data, d.id);
+  const head =
+    '<header class="dept-head">' +
+      '<h2>' + esc(d.name) + '</h2>' +
+      (d.intro && !d.restricted ? '<p>' + esc(d.intro) + '</p>' : '') +
+    '</header>';
+
+  const body = d.restricted ? renderRestricted(d, products) : renderVisual(d, products);
+
+  const order =
+    '<div class="dept-order">' +
+      '<p>' + esc(data.settings.vatNotice) + ' הזמנות ובירורים בוואטסאפ ' + esc(biz.whatsappDisplay) + '.</p>' +
+      '<a class="btn btn--sm" href="' + waLink(biz.whatsapp, orderText(d.name)) + '" target="_blank" rel="noopener">' +
+      waIcon + '<span>הזמנה בוואטסאפ</span></a>' +
+    '</div>';
+
+  return head + body + order;
+}
+
+/** מחלקה שאינה מוצרי עישון — תצוגה מלאה, ויזואלית, עם תנועה. */
+function renderVisual(d, products) {
+  if (!products.length) return '<div class="empty-state">אין כרגע מוצרים במחלקה הזו.</div>';
+
+  return '<div class="product-grid">' + products.map((p, i) => {
+    const alt = p.imageAlt || p.name;
+    const media = (d.showImages !== false && p.image)
+      ? '<div class="card__media"><img src="' + esc(p.image) + '" alt="' + esc(alt) +
+        '" loading="lazy" decoding="async" width="800" height="600"></div>'
+      : '<div class="card__media card__media--empty">' + esc(p.name) + '</div>';
+
+    const deal = (p.prevPrice && Number(p.prevPrice) > Number(p.price))
+      ? '<span class="deal-flag">מבצע</span>' : '';
+
+    return '<article class="card card--animated reveal tone-' + (i % 3) + '">' + deal + media +
+      '<div class="card__body">' +
+        '<h3 class="card__name">' + esc(p.name) + '</h3>' +
+        (d.showDescriptions !== false && p.description
+          ? '<p class="card__desc">' + esc(p.description) + '</p>' : '') +
+        '<div class="card__foot">' + priceMarkup(p) + stockMarkup(p.stock) + '</div>' +
+        addButton(p) +
+      '</div></article>';
+  }).join('') + '</div>';
+}
+
+/**
+ * מחלקת מוצרי עישון — פרטים בסיסיים בלבד.
+ * תמונה ותיאור נשלטים במתגים ייעודיים במחלקה, כבויים כברירת מחדל.
+ */
+function renderRestricted(d, products) {
+  const warning =
+    '<div class="legal-warning" role="note">' +
+      '<strong>' + esc(data.settings.smokingWarning) + '</strong>' +
+      '<span>' + esc(data.settings.ageNotice) + '</span>' +
+    '</div>';
+
+  if (!products.length) return warning + '<div class="empty-state">אין כרגע מוצרים במחלקה הזו.</div>';
+
+  const rows = products.map(p => {
+    let extra = '';
+    if (d.showImages === true && p.image) {
+      extra += '<div class="plain-row__extra"><img src="' + esc(p.image) + '" alt="' +
+               esc(p.imageAlt || p.name) + '" loading="lazy" decoding="async"></div>';
+    }
+    if (d.showDescriptions === true && p.description) {
+      extra += '<div class="plain-row__extra"><p>' + esc(p.description) + '</p></div>';
+    }
+    return '<div class="plain-row">' +
+      '<div class="plain-row__name">' + esc(p.name) + '</div>' +
+      '<div class="plain-row__price">' + esc(money(p.price)) + '</div>' +
+      '<div class="plain-row__stock">' + esc(stockLabel(p.stock)) + '</div>' +
+      '<div class="plain-row__add">' + addButton(p, true) + '</div>' + extra +
+    '</div>';
+  }).join('');
+
+  return warning +
+    '<div class="plain-list reveal">' +
+      '<div class="plain-list__head" aria-hidden="true">' +
+        '<div>שם המוצר</div><div>מחיר</div><div>זמינות</div></div>' + rows +
+    '</div>' +
+    '<p class="plain-note">' + esc(data.settings.vatNotice) +
+    ' הרשימה היא פירוט פרטים בסיסיים בלבד של מוצרים המוצעים למכירה, ואינה פרסומת.</p>';
+}
+
+/* ===================== מידע ותחתית ===================== */
+
+function renderInfo() {
+  document.getElementById('page-about').textContent = data.pages.about;
+
+  document.getElementById('biz-facts').innerHTML =
+    [['שם העוסק', biz.legalName], ['מספר עוסק או חברה', biz.businessId],
+     ['כתובת', biz.address], ['שעות פעילות', biz.hours],
+     ['וואטסאפ', biz.whatsappDisplay]]
+      .filter(([, v]) => v)
+      .map(([k, v]) => '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>').join('');
+
+  const docs = [
+    ['תקנון האתר', data.pages.terms],
+    ['מדיניות משלוחים', data.pages.shipping],
+    ['ביטול והחזרה', data.pages.returns],
+    ['מדיניות פרטיות', data.pages.privacy],
+    ['הצהרת נגישות', data.pages.accessibility + ' רכז הנגישות: ' +
+      biz.accessibilityOfficer + '. ' + biz.accessibilityContact]
+  ];
+  document.getElementById('legal-docs').innerHTML = docs.map(([t, b]) =>
+    '<details><summary>' + esc(t) + '</summary><p>' + esc(b) + '</p></details>').join('');
+
+  const hasRestricted = depts.some(d => d.restricted);
+  const fw = document.getElementById('footer-warning');
+  fw.hidden = !hasRestricted;
+  fw.textContent = data.settings.smokingWarning;
+
+  document.getElementById('footer-biz').textContent =
+    biz.legalName + ' · ' + biz.businessId + ' · ' + biz.address;
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  const fl = document.getElementById('footer-wa');
+  fl.href = waLink(biz.whatsapp, orderText());
+  fl.textContent = biz.whatsappDisplay;
+}
+
+/* ===================== שער גיל ===================== */
+
+function initAgeGate() {
+  const gate = document.getElementById('age-gate');
+  const needed = data.settings.ageGate && depts.some(d => d.restricted);
+  if (!needed || localStorage.getItem(Store.keys.GATE_KEY) === 'ok') { gate.hidden = true; return; }
+
+  gate.hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('gate-yes').focus();
+
+  document.getElementById('gate-yes').addEventListener('click', () => {
+    localStorage.setItem(Store.keys.GATE_KEY, 'ok');
+    gate.hidden = true;
+    document.body.style.overflow = '';
+  });
+  document.getElementById('gate-no').addEventListener('click', () => {
+    document.getElementById('gate-body').innerHTML =
+      '<h2>הכניסה אינה אפשרית</h2><p>האתר כולל מחלקות של מוצרי טבק ועישון, ' +
+      'שהמכירה בהן אסורה מתחת לגיל 18.</p>';
+  });
+}
+
+/* ===================== מתג צמצום תנועה ===================== */
+
+function initMotionToggle() {
+  const btn = document.getElementById('motion-toggle');
+  const on = localStorage.getItem(Store.keys.MOTION_KEY) === '1';
+  document.body.classList.toggle('no-motion', on);
+  btn.textContent = on ? 'הפעלת אנימציות' : 'צמצום אנימציות';
+  btn.setAttribute('aria-pressed', String(on));
+  btn.addEventListener('click', () => {
+    localStorage.setItem(Store.keys.MOTION_KEY, on ? '0' : '1');
+    location.reload();
+  });
+}
+
+/* ===================== הרצה ===================== */
+
+renderShell();
+renderTabs();
+renderInfo();
+initAgeGate();
+initMotionToggle();
+
+// קישור עמוק: כתובת עם עוגן פותחת ישירות את המחלקה המבוקשת
+const wanted = location.hash.replace('#', '');
+if (wanted && document.getElementById('panel-' + wanted)) selectTab(wanted, false);
+else {
+  // גם הלשונית הראשונה נחשפת ישירות, כדי שהתוכן לעולם לא יהיה תלוי במשקיף
+  const first = document.querySelector('.dept-panel:not([hidden])');
+  if (first) first.querySelectorAll('.reveal').forEach(el => el.classList.add('is-revealed'));
+}
+
+document.querySelectorAll('[data-scroll-to]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollToTarget(document.querySelector(a.getAttribute('data-scroll-to')));
+  });
+});
+
+revealHeadline(document.getElementById('hero-title'), [
+  esc(data.hero.titleA),
+  '<span class="grad">' + esc(data.hero.titleB) + '</span>',
+  esc(data.hero.titleC)
+]);
+
+initCart(data);
+initScroll();
+initReveals();
+initHero({
+  canvas: document.getElementById('hero-canvas'),
+  stage:  document.getElementById('hero-stage'),
+  track:  document.getElementById('strip-track'),
+  bg:     document.getElementById('bg-layer'),
+  columns: depts.length || 5
+});
+
+if (motionReduced()) document.documentElement.setAttribute('data-motion', 'reduced');
+
+</script>
+</body>
+</html>

@@ -376,12 +376,32 @@ $('act-save-content').addEventListener('click', () => {
 
 function renderSettings() {
   const s = data.settings;
+  const k = s.checkout || {};
   $('settings-form').innerHTML =
     field('s-warn', 'נוסח האזהרה הסטטוטורית', s.smokingWarning,
       { hint: 'מוצג בראש כל מחלקת עישון ובכותרת התחתונה.' }) +
     field('s-age', 'הודעת הגיל', s.ageNotice, { type: 'textarea' }) +
     field('s-vat', 'הודעת מס ערך מוסף', s.vatNotice) +
-    check('s-gate', 'הצגת שער אישור גיל בכניסה לאתר', s.ageGate !== false);
+    check('s-gate', 'הצגת שער אישור גיל בכניסה לאתר', s.ageGate !== false) +
+
+    '<h2>הזמנות ותשלום</h2>' +
+    check('k-enabled', 'הפעלת סל הזמנות באתר', k.enabled !== false) +
+    '<div class="form-grid form-grid--2">' +
+      field('k-fee', 'דמי משלוח בשקלים', k.deliveryFee, { type: 'number', step: '0.5' }) +
+      field('k-free', 'משלוח חינם מסכום של', k.freeDeliveryFrom,
+        { type: 'number', step: '1', hint: 'אפס מבטל את ההטבה.' }) +
+      field('k-min', 'מינימום הזמנה', k.minOrder, { type: 'number', step: '1', hint: 'אפס מבטל מינימום.' }) +
+      field('k-areas', 'אזורי משלוח', k.deliveryAreas) +
+    '</div>' +
+    field('k-pickup', 'כתובת לאיסוף עצמי', k.pickupAddress) +
+    check('k-cash', 'תשלום במזומן במעמד המסירה או האיסוף', k.payCash !== false) +
+    check('k-card', 'תשלום באשראי במעמד המסירה או האיסוף', k.payCardOnDelivery !== false) +
+    '<div class="callout callout--warn"><strong>אשראי מקוון</strong>' +
+      'האתר אינו אוסף פרטי כרטיס ואינו יכול לאסוף אותם. כדי לגבות אשראי מראש, ' +
+      'מנפיקים קישור תשלום אצל ספק סליקה מורשה ומדביקים אותו כאן. הקישור יוצג ' +
+      'כאפשרות תשלום, והלקוח יעבור לעמוד המאובטח של הספק.</div>' +
+    field('k-link', 'קישור תשלום מספק הסליקה', k.payLink, { type: 'url' }) +
+    field('k-linklabel', 'כיתוב לאפשרות התשלום בקישור', k.payLinkLabel);
 }
 
 $('act-save-settings').addEventListener('click', () => {
@@ -389,6 +409,18 @@ $('act-save-settings').addEventListener('click', () => {
   data.settings.ageNotice = $('s-age').value.trim();
   data.settings.vatNotice = $('s-vat').value.trim();
   data.settings.ageGate = $('s-gate').checked;
+  data.settings.checkout = Object.assign({}, data.settings.checkout, {
+    enabled: $('k-enabled').checked,
+    deliveryFee: Number($('k-fee').value) || 0,
+    freeDeliveryFrom: Number($('k-free').value) || 0,
+    minOrder: Number($('k-min').value) || 0,
+    deliveryAreas: $('k-areas').value.trim(),
+    pickupAddress: $('k-pickup').value.trim(),
+    payCash: $('k-cash').checked,
+    payCardOnDelivery: $('k-card').checked,
+    payLink: $('k-link').value.trim(),
+    payLinkLabel: $('k-linklabel').value.trim() || 'קישור תשלום מאובטח'
+  });
   persist('ההגדרות נשמרו');
 });
 
