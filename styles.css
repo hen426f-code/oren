@@ -131,7 +131,9 @@ button { font-family: inherit; font-size: inherit; }
 
 /* ===================== מסך הפתיחה ===================== */
 
-.stage { height: 270vh; position: relative; }
+/* אורך מסלול הגלילה של מסך הפתיחה. ככל שקצר יותר, ההתכנסות
+   מסתיימת מוקדם יותר. 270 היה ארוך מדי ודרש גלילה מייגעת. */
+.stage { height: 185vh; position: relative; }
 .stage--flat { height: auto; }
 
 .sticky {

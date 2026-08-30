@@ -26,7 +26,31 @@ let lastFocused = null;
 function cartLoad() {
   try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || {}; }
   catch (e) { cart = {}; }
+  cartPrune();
 }
+
+/**
+ * מסיר מהסל מוצרים שכבר אינם בקטלוג, וכמויות לא חוקיות.
+ *
+ * הצורך התגלה בהחלפת הקטלוג: המזהים החדשים שונים מהישנים, והסל
+ * השמור בדפדפן המשיך להחזיק מזהים מתים. הרשימה סיננה אותם בתצוגה
+ * אבל הספירה עדיין מנתה אותם, ולכן הופיע מספר על הכפתור מול סל ריק.
+ */
+function cartPrune() {
+  let changed = false;
+  for (const id of Object.keys(cart)) {
+    const qty = Number(cart[id]);
+    if (!productById(id) || !Number.isFinite(qty) || qty <= 0) {
+      delete cart[id];
+      changed = true;
+    } else if (cart[id] !== qty) {
+      cart[id] = qty;
+      changed = true;
+    }
+  }
+  if (changed) cartPersist();
+}
+
 function cartPersist() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
 
 function productById(id) { return siteData.products.find(p => p.id === id); }
@@ -40,7 +64,8 @@ function cartLines() {
 }
 
 function subtotal() { return cartLines().reduce((s, l) => s + l.total, 0); }
-function cartCount()    { return Object.values(cart).reduce((s, q) => s + q, 0); }
+// נגזר מהשורות התקפות ולא מהאחסון הגולמי, אחרת מזהה מת עדיין נספר
+function cartCount()    { return cartLines().reduce((s, l) => s + l.qty, 0); }
 
 /** דמי משלוח לפי ההגדרות, עם התחשבות בסף למשלוח חינם. */
 function deliveryFee(method) {
