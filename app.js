@@ -1,22 +1,30 @@
 /**
  * app.js — הרכבת חזית החנות מתוך הנתונים.
  *
- * ההבחנה המרכזית: מחלקה עם restricted מקבלת תבנית אחרת לגמרי —
- * רשימה טקסטואלית של שם, מחיר וזמינות. בלי תיאור שיווקי, בלי דירוגים,
- * בלי תגי מבצע ובלי אנימציה על השורה. תמונה ותיאור נשארים אפשריים,
- * אך רק אם בעל האתר הדליק אותם במפורש בהגדרות אותה מחלקה.
+ * שלוש הבחנות שקובעות את המבנה:
+ *  1. מחלקה עם restricted מקבלת תבנית אחרת לגמרי — רשימה טקסטואלית
+ *     של שם, מחיר וזמינות. בלי תיאור שיווקי ובלי תגי מבצע. תמונה
+ *     ותיאור אפשריים רק אם בעל האתר הדליק אותם באותה מחלקה.
+ *  2. מוצר שאזל יורד לתחתית הרשימה ומסומן באדום, בשתי התבניות.
+ *  3. לכל מוצר מערך תמונות. אחת מציגה תמונה בודדת, יותר מאחת מציגה
+ *     גלריה עם תמונות ממוזערות. המשתמש קובע כמה, הקוד לא מניח דבר.
  */
 
-import { Store, money, stockLabel, waLink, esc } from './store.js';
-import { motionReduced, initScroll, scrollToTarget, initReveals, revealHeadline, initHero,
-         lockScroll, unlockScroll } from './motion.js';
-import { initCart } from './cart.js';
+import { Store, money, stockLabel, waLink, esc, imagesOf, isOut, displayOrder } from './store.js';
+import { initCart, cartRefresh } from './cart.js';
+import { $, lockScroll, unlockScroll, anyOverlayOpen } from './ui.js';
+
+/** לוגו וואטסאפ, בשימוש בכפתור הצף ובכל כפתורי ההזמנה. */
+const WA_ICON =
+  '<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">' +
+  '<path d="M16.02 3C8.85 3 3.03 8.82 3.03 15.99c0 2.29.6 4.53 1.74 6.5L3 29l6.68-1.74a12.9 12.9 0 0 0 6.34 1.63h.01C23.2 28.89 29 23.07 29 15.9 29 12.43 27.65 9.17 25.2 6.72A12.87 12.87 0 0 0 16.02 3Zm7.55 18.44c-.32.9-1.87 1.72-2.6 1.83-.66.1-1.5.14-2.42-.15-.56-.18-1.28-.41-2.2-.81-3.87-1.67-6.4-5.57-6.6-5.83-.19-.26-1.57-2.09-1.57-3.99 0-1.9 1-2.83 1.35-3.22.36-.39.78-.49 1.04-.49h.75c.24.01.56-.09.88.67.32.78 1.1 2.69 1.2 2.88.1.2.16.42.03.68-.13.26-.19.42-.38.65-.19.23-.4.5-.57.68-.19.19-.39.4-.17.78.22.39.98 1.62 2.11 2.62 1.45 1.29 2.67 1.69 3.05 1.88.38.19.6.16.82-.1.23-.26.95-1.1 1.2-1.48.25-.39.5-.32.85-.19.35.13 2.22 1.05 2.6 1.24.38.19.64.29.73.45.1.16.1.93-.22 1.83Z"/></svg>';
 
 const data  = Store.load();
 const depts = Store.sortedDepartments(data);
 const biz   = data.business;
 
-/* ===================== עזרי סימון ===================== */
+
+/* ===================== עזרים ===================== */
 
 function orderText(deptName, productName) {
   let t = 'שלום, אשמח להזמין';
@@ -25,107 +33,126 @@ function orderText(deptName, productName) {
   return t;
 }
 
-function stockMarkup(status) {
-  const cls = status === 'out' ? 'out' : status === 'low' ? 'low' : 'in';
-  return '<span class="stock stock--' + cls + '">' + esc(stockLabel(status)) + '</span>';
+function slugOf(d) { return d.id.replace(/[^a-z0-9_-]/gi, ''); }
+
+function stockLine(p) {
+  const cls = p.stock === 'out' ? 'out' : p.stock === 'low' ? 'low' : 'in';
+  return '<span class="stock-line stock-line--' + cls + '">' + esc(stockLabel(p.stock)) + '</span>';
 }
 
-function priceMarkup(p) {
-  let html = '<span><span class="price__now">' + esc(money(p.price)) + '</span>';
+function priceHtml(p) {
+  let h = '<div class="card__price">' + esc(money(p.price));
   if (p.prevPrice && Number(p.prevPrice) > Number(p.price)) {
-    html += '<span class="price__prev">' + esc(money(p.prevPrice)) + '</span>';
+    h += '<s>' + esc(money(p.prevPrice)) + '</s>';
   }
-  return html + '</span>';
+  return h + '</div>';
 }
 
-/** כפתור הוספה לסל. מוצר שאזל אינו ניתן להוספה. */
 function addButton(p, plain) {
-  const cls = plain ? 'btn btn--soft btn--sm' : 'btn btn--sm';
-  if (p.stock === 'out') {
-    return '<button class="' + cls + '" type="button" disabled>אזל מהמלאי</button>';
-  }
+  const cls = plain ? 'btn btn--out btn--sm' : 'btn btn--sm btn--block';
+  if (isOut(p)) return '<button class="' + cls + '" type="button" disabled>אזל מהמלאי</button>';
   return '<button class="' + cls + '" type="button" data-add="' + esc(p.id) + '">הוספה לסל</button>';
 }
 
-const waIcon =
-  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-  '<path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.17c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>';
+/**
+ * גלריית תמונות. מספר התמונות נקבע לפי מה שהוזן בפאנל:
+ * אחת מציגה רק אותה, יותר מאחת מוסיפה שורת ממוזערות להחלפה.
+ */
+function galleryHtml(p) {
+  const imgs = imagesOf(p);
+  if (!imgs.length) return '<div class="gallery__empty">אין תמונה</div>';
+
+  const alt = p.imageAlt || p.name;
+  // referrerpolicy נדרש כי שרת התמונות חוסם בקשות שמגיעות עם מפנה זר,
+  // וזו הסיבה שהתמונות הופיעו שבורות. onerror מסיר תמונה שנכשלה,
+  // והממלא נכנס במקומה דרך הסגנון, בלי טקסט חלופי ענק שמעוות את הקוביה.
+  let h = '<div class="gallery" data-gallery="' + esc(p.id) + '">' +
+    '<div class="gallery__main"><img src="' + esc(imgs[0]) + '" alt="' + esc(alt) +
+    '" loading="lazy" decoding="async" referrerpolicy="no-referrer"' +
+    ' onerror="this.remove()"></div>';
+
+  if (imgs.length > 1) {
+    h += '<div class="gallery__thumbs">' + imgs.map((src, i) =>
+      '<button class="gallery__thumb" type="button" data-src="' + esc(src) + '"' +
+      ' aria-current="' + (i === 0) + '" aria-label="תמונה ' + (i + 1) + ' מתוך ' + imgs.length + '">' +
+      '<img src="' + esc(src) + '" alt="" loading="lazy" referrerpolicy="no-referrer"' +
+      ' onerror="this.parentElement.remove()"></button>').join('') + '</div>';
+  }
+  return h + '</div>';
+}
 
 /* ===================== מעטפת ===================== */
 
 function renderShell() {
   document.title = biz.name + ' — ' + biz.tagline;
+  $('brand-mark').textContent = biz.name.trim().charAt(0) || 'ח';
+  $('brand-name').textContent = biz.name;
+  $('brand-sub').textContent  = biz.tagline;
+  $('top-hours').textContent  = biz.hours || '';
+  $('top-phone').textContent  = 'וואטסאפ ' + biz.whatsappDisplay;
 
-  document.getElementById('brand-mark').textContent = (biz.name.trim().charAt(0) || 'ח');
-  document.getElementById('brand-name').textContent = biz.name;
-  document.getElementById('brand-sub').textContent  = biz.tagline;
+  $('hero-title').textContent = biz.name;
+  $('hero-lead').textContent  = data.hero.lead;
 
-  document.getElementById('hero-eyebrow').textContent =
-    data.hero.eyebrow + ' · ' + biz.whatsappDisplay;
-  document.getElementById('hero-lead').textContent = data.hero.lead;
-  document.getElementById('hero-cta-1').textContent = data.hero.ctaPrimary;
+  const wa = waLink(biz.whatsapp, orderText());
+  ['hero-cta-2', 'wa-fab', 'footer-wa', 'menu-wa'].forEach(id => { if ($(id)) $(id).href = wa; });
+  $('footer-wa').textContent = biz.whatsappDisplay;
+  $('wa-fab').innerHTML = WA_ICON + '<span class="visually-hidden">שיחה בוואטסאפ</span>';
+  $('menu-wa').innerHTML = WA_ICON + '<span>הזמנה בוואטסאפ</span>';
+  $('hero-cta-2').innerHTML = WA_ICON + '<span>הזמנה בוואטסאפ</span>';
 
-  const cta2 = document.getElementById('hero-cta-2');
-  cta2.href = waLink(biz.whatsapp, orderText());
-  cta2.innerHTML = waIcon + '<span>' + esc(data.hero.ctaSecondary) + '</span>';
+  // פס הניווט החום: כפתור הקטגוריות ואחריו חמש המחלקות הראשונות
+  $('quicknav').innerHTML =
+    '<button type="button" data-open-menu>לכל הקטגוריות</button>' +
+    depts.slice(0, 5).map(d =>
+      '<button type="button" data-goto="' + slugOf(d) + '">' + esc(d.name) + '</button>').join('');
 
-  const fab = document.getElementById('wa-fab');
-  fab.href = waLink(biz.whatsapp, orderText());
-  fab.innerHTML = waIcon + '<span class="visually-hidden">פתיחת שיחה בוואטסאפ</span>';
-
-  // הרצועה מכילה את הרשימה שלוש פעמים, כדי שהלולאה תהיה רציפה
-  const names = depts.map(d => d.name);
-  const triple = names.concat(names, names);
-  document.getElementById('strip-track').innerHTML =
-    triple.map(n => '<li>' + esc(n) + '</li>').join('');
+  // תפריט הצד: כל המחלקות, עם מספר הפריטים בכל אחת
+  $('menu-list').innerHTML = depts.map(d => {
+    const n = Store.productsOf(data, d.id).length;
+    return '<button class="drawer__link" type="button" data-goto="' + slugOf(d) + '">' +
+      '<span>' + esc(d.name) + (d.restricted ? ' <span class="flag">18+</span>' : '') + '</span>' +
+      '<span class="n">' + n + '</span></button>';
+  }).join('');
 }
 
-/* ===================== לשוניות המחלקות ===================== */
-
-/** עוגן יציב, נגזר מהמזהה כדי שקישור עמוק לא ישבר בשינוי שם המחלקה. */
-function slugOf(d) { return d.id.replace(/[^a-z0-9_-]/gi, ''); }
+/* ===================== מחלקות ===================== */
 
 function renderTabs() {
-  const tabsEl = document.getElementById('dept-tabs');
-  const panelsEl = document.getElementById('dept-panels');
-
   if (!depts.length) {
-    tabsEl.innerHTML = '';
-    panelsEl.innerHTML = '<div class="empty-state">עדיין לא הוגדרו מחלקות. אפשר להוסיף אותן בפאנל הניהול.</div>';
+    $('dept-panels').innerHTML = '<div class="empty-state">עדיין לא הוגדרו מחלקות.</div>';
     return;
   }
-
-  tabsEl.innerHTML = depts.map((d, i) =>
+  $('dept-tabs').innerHTML = depts.map((d, i) =>
     '<button class="dept-tab" role="tab" type="button" id="tab-' + slugOf(d) + '"' +
     ' aria-controls="panel-' + slugOf(d) + '" aria-selected="' + (i === 0) + '"' +
     ' tabindex="' + (i === 0 ? 0 : -1) + '">' + esc(d.name) +
     (d.restricted ? '<span class="dept-tab__flag">18+</span>' : '') + '</button>').join('');
 
-  panelsEl.innerHTML = depts.map((d, i) =>
+  $('dept-panels').innerHTML = depts.map((d, i) =>
     '<section class="dept-panel" role="tabpanel" id="panel-' + slugOf(d) + '"' +
     ' aria-labelledby="tab-' + slugOf(d) + '" tabindex="0"' + (i === 0 ? '' : ' hidden') + '>' +
     renderDept(d) + '</section>').join('');
 
-  tabsEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('.dept-tab');
-    if (btn) selectTab(btn.id.replace('tab-', ''), true);
+  $('dept-tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('.dept-tab');
+    if (b) selectTab(b.id.replace('tab-', ''), true);
   });
 
-  // ניווט מקלדת לפי דפוס ה-tablist המקובל. בממשק מימין לשמאל,
-  // חץ שמאלה מתקדם קדימה ברשימה.
-  tabsEl.addEventListener('keydown', (e) => {
+  // ניווט מקלדת לפי דפוס ה-tablist. בממשק מימין לשמאל חץ שמאלה מתקדם.
+  $('dept-tabs').addEventListener('keydown', (e) => {
     if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
     e.preventDefault();
-    const all = [...tabsEl.querySelectorAll('.dept-tab')];
+    const all = [...$('dept-tabs').querySelectorAll('.dept-tab')];
     const cur = all.findIndex(b => b.getAttribute('aria-selected') === 'true');
-    let next = cur;
-    if (e.key === 'ArrowLeft')  next = (cur + 1) % all.length;
-    if (e.key === 'ArrowRight') next = (cur - 1 + all.length) % all.length;
-    if (e.key === 'Home') next = 0;
-    if (e.key === 'End')  next = all.length - 1;
-    const id = all[next].id.replace('tab-', '');
+    let n = cur;
+    if (e.key === 'ArrowLeft')  n = (cur + 1) % all.length;
+    if (e.key === 'ArrowRight') n = (cur - 1 + all.length) % all.length;
+    if (e.key === 'Home') n = 0;
+    if (e.key === 'End')  n = all.length - 1;
+    const id = all[n].id.replace('tab-', '');
     selectTab(id, true);
-    document.getElementById('tab-' + id).focus();
+    $('tab-' + id).focus();
   });
 }
 
@@ -137,170 +164,272 @@ function selectTab(slug, updateHash) {
   });
   document.querySelectorAll('.dept-panel').forEach(p => { p.hidden = p.id !== 'panel-' + slug; });
   if (updateHash) history.replaceState(null, '', '#' + slug);
-
-  // תוכן שנחשף בלחיצה על לשונית מוצג מיד. משקיף הגלילה אינו נורה על
-  // אלמנט שהיה מוסתר, ובלי השורה הזו הרשימה נשארת בשקיפות אפס.
-  const panel = document.getElementById('panel-' + slug);
-  if (panel) panel.querySelectorAll('.reveal').forEach(el => el.classList.add('is-revealed'));
+  closeResults();
 }
 
-/* ===================== שתי התבניות ===================== */
-
 function renderDept(d) {
-  const products = Store.productsOf(data, d.id);
-  const head =
-    '<header class="dept-head">' +
-      '<h2>' + esc(d.name) + '</h2>' +
-      (d.intro && !d.restricted ? '<p>' + esc(d.intro) + '</p>' : '') +
-    '</header>';
-
+  const products = displayOrder(Store.productsOf(data, d.id));
+  const head = '<header class="dept-head"><h2>' + esc(d.name) + '</h2>' +
+    (d.intro && !d.restricted ? '<p>' + esc(d.intro) + '</p>' : '') + '</header>';
   const body = d.restricted ? renderRestricted(d, products) : renderVisual(d, products);
-
-  const order =
-    '<div class="dept-order">' +
-      '<p>' + esc(data.settings.vatNotice) + ' הזמנות ובירורים בוואטסאפ ' + esc(biz.whatsappDisplay) + '.</p>' +
-      '<a class="btn btn--sm" href="' + waLink(biz.whatsapp, orderText(d.name)) + '" target="_blank" rel="noopener">' +
-      waIcon + '<span>הזמנה בוואטסאפ</span></a>' +
-    '</div>';
-
+  const order = '<div class="dept-order">' +
+    '<p>' + esc(data.settings.vatNotice) + ' הזמנות בוואטסאפ ' + esc(biz.whatsappDisplay) + '.</p>' +
+    '<a class="btn btn--green btn--sm" href="' + waLink(biz.whatsapp, orderText(d.name)) +
+    '" target="_blank" rel="noopener">' + WA_ICON + '<span>הזמנה בוואטסאפ</span></a></div>';
   return head + body + order;
 }
 
-/** מחלקה שאינה מוצרי עישון — תצוגה מלאה, ויזואלית, עם תנועה. */
+/**
+ * קוביית מוצר. plain מסמן גרסה יבשה למחלקת מוצרי עישון: אותו מבנה,
+ * בלי תגי מבצע ובלי הדגשות, כדי שלא תיקרא כפרסומת.
+ */
+function cardHtml(p, dept, plain) {
+  const showImg = dept.showImages !== false;
+  const media = showImg ? galleryHtml(p) : '<div class="gallery__empty"></div>';
+  const showDesc = plain ? dept.showDescriptions === true : dept.showDescriptions !== false;
+  const deal = (!plain && p.prevPrice && Number(p.prevPrice) > Number(p.price))
+    ? '<p class="card__note">מבצע</p>' : '';
+
+  return '<article class="card' + (plain ? ' card--plain' : '') +
+    (isOut(p) ? ' card--out' : '') + '">' + media +
+    '<div class="card__body">' +
+      '<h3 class="card__name">' + esc(p.name) + '</h3>' +
+      (showDesc && p.description ? '<p class="card__desc">' + esc(p.description) + '</p>' : '') +
+      deal +
+      priceHtml(p) +
+      (isOut(p) ? '<div class="out-banner">אזל זמנית מהמלאי</div>' : stockLine(p)) +
+      addButton(p) +
+    '</div></article>';
+}
+
+/** מחלקה רגילה — קוביות מלאות. */
 function renderVisual(d, products) {
   if (!products.length) return '<div class="empty-state">אין כרגע מוצרים במחלקה הזו.</div>';
-
-  return '<div class="product-grid">' + products.map((p, i) => {
-    const alt = p.imageAlt || p.name;
-    const media = (d.showImages !== false && p.image)
-      ? '<div class="card__media"><img src="' + esc(p.image) + '" alt="' + esc(alt) +
-        '" loading="lazy" decoding="async" width="800" height="600"></div>'
-      : '<div class="card__media card__media--empty">' + esc(p.name) + '</div>';
-
-    const deal = (p.prevPrice && Number(p.prevPrice) > Number(p.price))
-      ? '<span class="deal-flag">מבצע</span>' : '';
-
-    return '<article class="card card--animated reveal tone-' + (i % 3) + '">' + deal + media +
-      '<div class="card__body">' +
-        '<h3 class="card__name">' + esc(p.name) + '</h3>' +
-        (d.showDescriptions !== false && p.description
-          ? '<p class="card__desc">' + esc(p.description) + '</p>' : '') +
-        '<div class="card__foot">' + priceMarkup(p) + stockMarkup(p.stock) + '</div>' +
-        addButton(p) +
-      '</div></article>';
-  }).join('') + '</div>';
+  return '<div class="product-grid">' +
+    products.map(p => cardHtml(p, d, false)).join('') + '</div>';
 }
 
 /**
- * מחלקת מוצרי עישון — פרטים בסיסיים בלבד.
- * תמונה ותיאור נשלטים במתגים ייעודיים במחלקה, כבויים כברירת מחדל.
+ * מחלקת מוצרי עישון — אותה פריסה, בגרסה היבשה.
+ * האזהרה הסטטוטורית נשארת בראש המחלקה, וההערה בסופה.
  */
 function renderRestricted(d, products) {
-  const warning =
-    '<div class="legal-warning" role="note">' +
-      '<strong>' + esc(data.settings.smokingWarning) + '</strong>' +
-      '<span>' + esc(data.settings.ageNotice) + '</span>' +
-    '</div>';
+  const warning = '<div class="legal-warning" role="note">' +
+    '<strong>' + esc(data.settings.smokingWarning) + '</strong>' +
+    '<span>' + esc(data.settings.ageNotice) + '</span></div>';
 
   if (!products.length) return warning + '<div class="empty-state">אין כרגע מוצרים במחלקה הזו.</div>';
 
-  const rows = products.map(p => {
-    let extra = '';
-    if (d.showImages === true && p.image) {
-      extra += '<div class="plain-row__extra"><img src="' + esc(p.image) + '" alt="' +
-               esc(p.imageAlt || p.name) + '" loading="lazy" decoding="async"></div>';
-    }
-    if (d.showDescriptions === true && p.description) {
-      extra += '<div class="plain-row__extra"><p>' + esc(p.description) + '</p></div>';
-    }
-    return '<div class="plain-row">' +
-      '<div class="plain-row__name">' + esc(p.name) + '</div>' +
-      '<div class="plain-row__price">' + esc(money(p.price)) + '</div>' +
-      '<div class="plain-row__stock">' + esc(stockLabel(p.stock)) + '</div>' +
-      '<div class="plain-row__add">' + addButton(p, true) + '</div>' + extra +
-    '</div>';
-  }).join('');
-
-  return warning +
-    '<div class="plain-list reveal">' +
-      '<div class="plain-list__head" aria-hidden="true">' +
-        '<div>שם המוצר</div><div>מחיר</div><div>זמינות</div></div>' + rows +
-    '</div>' +
+  return warning + '<div class="product-grid">' +
+    products.map(p => cardHtml(p, d, true)).join('') + '</div>' +
     '<p class="plain-note">' + esc(data.settings.vatNotice) +
     ' הרשימה היא פירוט פרטים בסיסיים בלבד של מוצרים המוצעים למכירה, ואינה פרסומת.</p>';
 }
 
-/* ===================== מידע ותחתית ===================== */
+/* ===================== חיפוש ===================== */
+
+/**
+ * נרמול לחיפוש: הסרת ניקוד, גרשיים ומקפים, וכיווץ רווחים.
+ * בלי זה "סיגריות" ו"סיגריות־אלקטרוניות" לא נחשבים דומים.
+ */
+function norm(s) {
+  return String(s || '').toLowerCase()
+    .replace(/[\u0591-\u05C7]/g, '')
+    .replace(/["'`\u05F3\u05F4\u2019\-־–—/|]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * התאמה גמישה: נחשב מתאים אם המונח פותח את הטקסט, פותח אחת המילים
+ * שבו, או מופיע בתוכו. כך "סיג" מוצא גם סיגריות וגם סיגריות אלקטרוניות.
+ */
+function matches(text, q) {
+  const t = norm(text);
+  if (!q) return false;
+  if (t.startsWith(q)) return true;
+  if (t.split(' ').some(w => w.startsWith(q))) return true;
+  return t.includes(q);
+}
+
+function search(term) {
+  const q = norm(term);
+  if (q.length < 2) return { depts: [], products: [] };
+  const dm = depts.filter(d => matches(d.name, q));
+  const pm = data.products.filter(p => matches(p.name, q) || matches(p.description, q));
+  return { depts: dm, products: displayOrder(pm) };
+}
+
+function deptName(id) {
+  const d = depts.find(x => x.id === id);
+  return d ? d.name : '';
+}
+
+function renderSuggest(term) {
+  const box = $('search-suggest');
+  const { depts: dm, products: pm } = search(term);
+  if (!dm.length && !pm.length) { box.hidden = true; return; }
+
+  const rows = dm.slice(0, 6).map(d =>
+      '<button type="button" data-goto="' + slugOf(d) + '">' +
+      '<span>' + esc(d.name) + '</span><span class="kind">מחלקה</span></button>').join('')
+    + pm.slice(0, 8).map(p => {
+      const img = imagesOf(p)[0];
+      return '<button type="button" data-find="' + esc(p.name) + '">' +
+        (img ? '<img src="' + esc(img) + '" alt="">' : '') +
+        '<span>' + esc(p.name) + '</span>' +
+        '<span class="kind">' + esc(deptName(p.deptId)) + '</span></button>';
+    }).join('');
+
+  box.innerHTML = rows;
+  box.hidden = false;
+}
+
+function showResults(term) {
+  const { depts: dm, products: pm } = search(term);
+  $('search-suggest').hidden = true;
+  $('results-title').textContent = 'תוצאות חיפוש עבור ' + term + ' — ' + pm.length + ' מוצרים';
+
+  if (!pm.length && !dm.length) {
+    $('results-body').innerHTML = '<div class="empty-state">לא נמצאו תוצאות.</div>';
+  } else {
+    const chips = dm.length
+      ? '<p class="section__lead">מחלקות מתאימות: ' + dm.map(d =>
+          '<button class="btn btn--out btn--sm" type="button" data-goto="' + slugOf(d) + '">' +
+          esc(d.name) + '</button>').join(' ') + '</p>'
+      : '';
+    $('results-body').innerHTML = chips + '<div class="product-grid">' + pm.map(p => {
+      const d = depts.find(x => x.id === p.deptId) || {};
+      return cardHtml(p, d, !!d.restricted);
+    }).join('') + '</div>';
+  }
+
+  $('results-section').hidden = false;
+  $('results-section').scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+function closeResults() { $('results-section').hidden = true; }
+
+function initSearch() {
+  const bar = $('searchbar'), input = $('search-input'), box = $('search-suggest');
+
+  $('search-open').addEventListener('click', () => {
+    const open = bar.hidden;
+    bar.hidden = !open;
+    $('search-open').setAttribute('aria-expanded', String(open));
+    if (open) input.focus();
+  });
+  $('search-close').addEventListener('click', () => {
+    bar.hidden = true; box.hidden = true; input.value = ''; closeResults();
+    $('search-open').setAttribute('aria-expanded', 'false');
+  });
+
+  input.addEventListener('input', () => renderSuggest(input.value));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); showResults(input.value.trim()); }
+    if (e.key === 'Escape') { box.hidden = true; }
+  });
+
+  box.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-find]');
+    if (b) { input.value = b.dataset.find; showResults(b.dataset.find); }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!bar.hidden && !bar.contains(e.target) && e.target !== $('search-open')) box.hidden = true;
+  });
+}
+
+/* ===================== תפריט הצד ===================== */
+
+function initMenu() {
+  const drawer = $('menu-drawer');
+  const open  = () => { drawer.hidden = false; lockScroll(); $('menu-close').focus(); };
+  const close = () => { drawer.hidden = true; if (!anyOverlayOpen()) unlockScroll(); $('menu-open').focus(); };
+
+  $('menu-open').addEventListener('click', open);
+  $('menu-close').addEventListener('click', close);
+  $('menu-back').addEventListener('click', close);
+  $('hero-cta-1').addEventListener('click', open);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !drawer.hidden) close(); });
+
+  // מאזין אחד לכל כפתורי המעבר למחלקה, מכל מקום באתר
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-open-menu]');
+    if (b) { open(); return; }
+    const g = e.target.closest('[data-goto]');
+    if (!g) return;
+    selectTab(g.dataset.goto, true);
+    drawer.hidden = true;
+    $('searchbar').hidden = true;
+    $('search-suggest').hidden = true;
+    if (!anyOverlayOpen()) unlockScroll();
+    const panel = $('panel-' + g.dataset.goto);
+    if (panel) panel.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+}
+
+/* ===================== גלריות ===================== */
+
+function initGalleries() {
+  document.addEventListener('click', (e) => {
+    const th = e.target.closest('.gallery__thumb');
+    if (!th) return;
+    const g = th.closest('.gallery');
+    g.querySelector('.gallery__main img').src = th.dataset.src;
+    g.querySelectorAll('.gallery__thumb').forEach(x => x.setAttribute('aria-current', String(x === th)));
+  });
+}
+
+/* ===================== מידע, שער גיל, נגישות ===================== */
 
 function renderInfo() {
-  document.getElementById('page-about').textContent = data.pages.about;
+  $('page-about').textContent = data.pages.about;
+  $('biz-facts').innerHTML = [
+    ['שם העוסק', biz.legalName], ['מספר עוסק או חברה', biz.businessId],
+    ['כתובת', biz.address], ['שעות פעילות', biz.hours], ['וואטסאפ', biz.whatsappDisplay]
+  ].filter(([, v]) => v).map(([k, v]) =>
+    '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>').join('');
 
-  document.getElementById('biz-facts').innerHTML =
-    [['שם העוסק', biz.legalName], ['מספר עוסק או חברה', biz.businessId],
-     ['כתובת', biz.address], ['שעות פעילות', biz.hours],
-     ['וואטסאפ', biz.whatsappDisplay]]
-      .filter(([, v]) => v)
-      .map(([k, v]) => '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>').join('');
-
-  const docs = [
+  $('legal-docs').innerHTML = [
     ['תקנון האתר', data.pages.terms],
     ['מדיניות משלוחים', data.pages.shipping],
     ['ביטול והחזרה', data.pages.returns],
     ['מדיניות פרטיות', data.pages.privacy],
     ['הצהרת נגישות', data.pages.accessibility + ' רכז הנגישות: ' +
       biz.accessibilityOfficer + '. ' + biz.accessibilityContact]
-  ];
-  document.getElementById('legal-docs').innerHTML = docs.map(([t, b]) =>
-    '<details><summary>' + esc(t) + '</summary><p>' + esc(b) + '</p></details>').join('');
+  ].map(([t, b]) => '<details><summary>' + esc(t) + '</summary><p>' + esc(b) + '</p></details>').join('');
 
-  const hasRestricted = depts.some(d => d.restricted);
-  const fw = document.getElementById('footer-warning');
-  fw.hidden = !hasRestricted;
+  const fw = $('footer-warning');
+  fw.hidden = !depts.some(d => d.restricted);
   fw.textContent = data.settings.smokingWarning;
-
-  document.getElementById('footer-biz').textContent =
-    biz.legalName + ' · ' + biz.businessId + ' · ' + biz.address;
-  document.getElementById('footer-year').textContent = new Date().getFullYear();
-
-  const fl = document.getElementById('footer-wa');
-  fl.href = waLink(biz.whatsapp, orderText());
-  fl.textContent = biz.whatsappDisplay;
+  $('footer-biz').textContent = biz.legalName + ' · ' + biz.businessId + ' · ' + biz.address;
+  $('footer-year').textContent = new Date().getFullYear();
 }
-
-/* ===================== שער גיל ===================== */
 
 function initAgeGate() {
-  const gate = document.getElementById('age-gate');
+  const gate = $('age-gate');
   const needed = data.settings.ageGate && depts.some(d => d.restricted);
   if (!needed || localStorage.getItem(Store.keys.GATE_KEY) === 'ok') { gate.hidden = true; return; }
-
   gate.hidden = false;
   lockScroll();
-  document.getElementById('gate-yes').focus();
-
-  document.getElementById('gate-yes').addEventListener('click', () => {
+  $('gate-yes').focus();
+  $('gate-yes').addEventListener('click', () => {
     localStorage.setItem(Store.keys.GATE_KEY, 'ok');
     gate.hidden = true;
-    unlockScroll();
+    if (!anyOverlayOpen()) unlockScroll();
   });
-  document.getElementById('gate-no').addEventListener('click', () => {
-    document.getElementById('gate-body').innerHTML =
-      '<h2>הכניסה אינה אפשרית</h2><p>האתר כולל מחלקות של מוצרי טבק ועישון, ' +
-      'שהמכירה בהן אסורה מתחת לגיל 18.</p>';
+  $('gate-no').addEventListener('click', () => {
+    $('gate-body').innerHTML = '<h2>הכניסה אינה אפשרית</h2>' +
+      '<p>האתר כולל מחלקות של מוצרי טבק ועישון, שהמכירה בהן אסורה מתחת לגיל 18.</p>';
   });
 }
 
-/* ===================== מתג צמצום תנועה ===================== */
-
-function initMotionToggle() {
-  const btn = document.getElementById('motion-toggle');
-  const on = localStorage.getItem(Store.keys.MOTION_KEY) === '1';
-  document.body.classList.toggle('no-motion', on);
-  btn.textContent = on ? 'הפעלת אנימציות' : 'צמצום אנימציות';
-  btn.setAttribute('aria-pressed', String(on));
-  btn.addEventListener('click', () => {
-    localStorage.setItem(Store.keys.MOTION_KEY, on ? '0' : '1');
-    location.reload();
+/** הגדלת טקסט פשוטה, כמו בכפתור הנגישות שבאתרים מסחריים. */
+function initA11y() {
+  let step = 0;
+  $('a11y-fab').addEventListener('click', () => {
+    step = (step + 1) % 3;
+    document.documentElement.style.fontSize = [16, 18, 20][step] + 'px';
   });
 }
 
@@ -310,39 +439,13 @@ renderShell();
 renderTabs();
 renderInfo();
 initAgeGate();
-initMotionToggle();
-
-// קישור עמוק: כתובת עם עוגן פותחת ישירות את המחלקה המבוקשת
-const wanted = location.hash.replace('#', '');
-if (wanted && document.getElementById('panel-' + wanted)) selectTab(wanted, false);
-else {
-  // גם הלשונית הראשונה נחשפת ישירות, כדי שהתוכן לעולם לא יהיה תלוי במשקיף
-  const first = document.querySelector('.dept-panel:not([hidden])');
-  if (first) first.querySelectorAll('.reveal').forEach(el => el.classList.add('is-revealed'));
-}
-
-document.querySelectorAll('[data-scroll-to]').forEach(a => {
-  a.addEventListener('click', (e) => {
-    e.preventDefault();
-    scrollToTarget(document.querySelector(a.getAttribute('data-scroll-to')));
-  });
-});
-
-revealHeadline(document.getElementById('hero-title'), [
-  esc(data.hero.titleA),
-  '<span class="grad">' + esc(data.hero.titleB) + '</span>',
-  esc(data.hero.titleC)
-]);
-
+initSearch();
+initMenu();
+initGalleries();
+initA11y();
 initCart(data);
-initScroll();
-initReveals();
-initHero({
-  canvas: document.getElementById('hero-canvas'),
-  stage:  document.getElementById('hero-stage'),
-  track:  document.getElementById('strip-track'),
-  bg:     document.getElementById('bg-layer'),
-  columns: depts.length || 5
-});
 
-if (motionReduced()) document.documentElement.setAttribute('data-motion', 'reduced');
+const wanted = location.hash.replace('#', '');
+if (wanted && $('panel-' + wanted)) selectTab(wanted, false);
+
+cartRefresh();
