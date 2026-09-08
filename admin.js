@@ -7,7 +7,7 @@
  * כברירת מחדל ומלווים באזהרה.
  */
 
-import { Store, money, stockLabel, esc } from './store.js';
+import { Store, money, stockLabel, esc, imagesOf, isOut, displayOrder } from './store.js';
 
 let data = Store.load();
 const $ = (id) => document.getElementById(id);
@@ -103,10 +103,10 @@ function renderDepts() {
         '<span class="admin-row__title">' + esc(d.name) + '</span>' + flags +
         '<span class="admin-row__meta">' + count + ' מוצרים</span></div>' +
       '<div class="admin-row__acts">' +
-        '<button class="btn btn--quiet btn--sm" data-act="up" ' + (i === 0 ? 'disabled' : '') + ' type="button">העלאה בסדר</button>' +
-        '<button class="btn btn--quiet btn--sm" data-act="down" ' + (i === list.length - 1 ? 'disabled' : '') + ' type="button">הורדה בסדר</button>' +
-        '<button class="btn btn--soft btn--sm" data-act="edit" type="button">עריכה</button>' +
-        '<button class="btn btn--danger btn--sm" data-act="del" type="button">מחיקה</button>' +
+        '<button class="btn btn--out btn--sm" data-act="up" ' + (i === 0 ? 'disabled' : '') + ' type="button">העלאה בסדר</button>' +
+        '<button class="btn btn--out btn--sm" data-act="down" ' + (i === list.length - 1 ? 'disabled' : '') + ' type="button">הורדה בסדר</button>' +
+        '<button class="btn btn--out btn--sm" data-act="edit" type="button">עריכה</button>' +
+        '<button class="btn btn--red btn--sm" data-act="del" type="button">מחיקה</button>' +
       '</div></div>';
   }).join('');
 }
@@ -207,23 +207,29 @@ function renderProducts() {
       (dept.showDescriptions ? 'מדליקים תיאורים' : 'מכבים תיאורים') + '.</div>'
     : '';
 
-  const list = Store.productsOf(data, deptId);
+  const list = displayOrder(Store.productsOf(data, deptId));
   if (!list.length) { $('prod-list').innerHTML = '<div class="empty-state">אין עדיין מוצרים במחלקה הזו.</div>'; return; }
 
   $('prod-list').innerHTML = list.map((p, i) => {
     const deal = (p.prevPrice && Number(p.prevPrice) > Number(p.price))
       ? '<span class="tag tag--open">מבצע</span>' : '';
-    const img = p.image ? '<span class="tag">יש תמונה</span>' : '';
-    return '<div class="admin-row" data-id="' + p.id + '">' +
-      '<div class="admin-row__main">' +
+    const imgs = imagesOf(p);
+    const thumb = imgs.length
+      ? '<img class="admin-row__thumb" src="' + esc(imgs[0]) + '" alt="" referrerpolicy="no-referrer" onerror="this.remove()">' : '';
+    const nImg = imgs.length > 1 ? '<span class="tag">' + imgs.length + ' תמונות</span>' : '';
+    const out = isOut(p) ? '<span class="tag tag--out">אזל</span>' : '';
+    return '<div class="admin-row' + (isOut(p) ? ' admin-row--out' : '') + '" data-id="' + p.id + '">' +
+      '<div class="admin-row__main">' + thumb +
         '<span class="admin-row__title">' + esc(p.name) + '</span>' +
         '<span class="admin-row__meta">' + esc(money(p.price)) + ' · ' + esc(stockLabel(p.stock)) + '</span>' +
-        deal + img + '</div>' +
+        out + deal + nImg + '</div>' +
       '<div class="admin-row__acts">' +
-        '<button class="btn btn--quiet btn--sm" data-act="up" ' + (i === 0 ? 'disabled' : '') + ' type="button">העלאה בסדר</button>' +
-        '<button class="btn btn--quiet btn--sm" data-act="down" ' + (i === list.length - 1 ? 'disabled' : '') + ' type="button">הורדה בסדר</button>' +
-        '<button class="btn btn--soft btn--sm" data-act="edit" type="button">עריכה</button>' +
-        '<button class="btn btn--danger btn--sm" data-act="del" type="button">מחיקה</button>' +
+        '<button class="btn ' + (isOut(p) ? 'btn--tan' : 'btn--red') + ' btn--sm" data-act="stock" type="button">' +
+          (isOut(p) ? 'החזרה למלאי' : 'הסרה מהמלאי') + '</button>' +
+        '<button class="btn btn--out btn--sm" data-act="up" ' + (i === 0 ? 'disabled' : '') + ' type="button">מעלה</button>' +
+        '<button class="btn btn--out btn--sm" data-act="down" ' + (i === list.length - 1 ? 'disabled' : '') + ' type="button">מטה</button>' +
+        '<button class="btn btn--out btn--sm" data-act="edit" type="button">עריכה</button>' +
+        '<button class="btn btn--red btn--sm" data-act="del" type="button">מחיקה</button>' +
       '</div></div>';
   }).join('');
 }
@@ -253,6 +259,14 @@ $('prod-list').addEventListener('click', (e) => {
     persist('המוצר נמחק'); renderProducts();
   }
 
+  if (act === 'stock') {
+    // החלפה מהירה בלי לפתוח את חלון העריכה. מוצר שאזל יורד לתחתית
+    // הרשימה כאן ובאתר, ומוצג באדום.
+    prod.stock = isOut(prod) ? 'in' : 'out';
+    persist(isOut(prod) ? 'המוצר סומן כאזל' : 'המוצר הוחזר למלאי');
+    renderProducts();
+  }
+
   if (act === 'edit') editProduct(prod);
 });
 
@@ -261,7 +275,7 @@ $('act-add-prod').addEventListener('click', () => {
   if (!deptId) { toast('צריך קודם להגדיר מחלקה'); return; }
   const maxOrder = Store.productsOf(data, deptId).reduce((m, p) => Math.max(m, p.order || 0), 0);
   editProduct({ id: Store.uid('prd'), deptId, name: '', price: 0, prevPrice: null,
-                stock: 'in', image: '', imageAlt: '', description: '', order: maxOrder + 1 }, true);
+                stock: 'in', images: [], imageAlt: '', description: '', order: maxOrder + 1 }, true);
 });
 
 function editProduct(prod, isNew) {
@@ -280,8 +294,9 @@ function editProduct(prod, isNew) {
     '</div>' +
     field('f-stock', 'זמינות', prod.stock,
       { type: 'select', options: [['in', 'במלאי'], ['low', 'מלאי מוגבל'], ['out', 'אזל מהמלאי']] }) +
-    field('f-image', 'כתובת התמונה', prod.image,
-      { type: 'url', hint: 'שדה זמין בכל המחלקות, גם במחלקות מוצרי עישון. אפשר להשאיר ריק.' }) +
+    field('f-imglist', 'תמונות המוצר', imagesOf(prod).join('\n'),
+      { type: 'textarea',
+        hint: 'כתובת אחת בכל שורה. תמונה אחת תוצג לבדה, כמה תמונות יוצגו כגלריה עם ממוזערות. אפשר להשאיר ריק.' }) +
     field('f-alt', 'טקסט חלופי לתמונה', prod.imageAlt,
       { type: 'text', hint: 'חובה לנגישות כשיש תמונה. תיאור ענייני של מה שרואים.' }) +
     field('f-pdesc', 'תיאור המוצר', prod.description, { type: 'textarea' }) +
@@ -291,16 +306,17 @@ function editProduct(prod, isNew) {
   openModal(isNew ? 'מוצר חדש' : 'עריכת מוצר', body, () => {
     const name = $('f-pname').value.trim();
     if (!name) { toast('צריך שם למוצר'); $('f-pname').focus(); return; }
-    const image = $('f-image').value.trim();
+    const images = $('f-imglist').value.split('\n').map(s => s.trim()).filter(Boolean);
     const alt = $('f-alt').value.trim();
-    if (image && !alt) { toast('כשיש תמונה צריך גם טקסט חלופי'); $('f-alt').focus(); return; }
+    if (images.length && !alt) { toast('כשיש תמונה צריך גם טקסט חלופי'); $('f-alt').focus(); return; }
 
     prod.name = name;
     prod.price = Number($('f-price').value) || 0;
     const prev = $('f-prev').value.trim();
     prod.prevPrice = prev === '' ? null : Number(prev);
     prod.stock = $('f-stock').value;
-    prod.image = image;
+    prod.images = images;
+    prod.image = images[0] || '';   // נשמר לתאימות עם קטלוג במבנה הישן
     prod.imageAlt = alt;
     prod.description = $('f-pdesc').value.trim();
     prod.deptId = $('f-pdept').value;

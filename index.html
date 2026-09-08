@@ -5,30 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>החנות</title>
 <meta name="description" content="חנות רב־מחלקתית. הזמנות בוואטסאפ.">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-
-<!-- הקטלוג המפורסם. נטען לפני היישום ומשמש כמקור הנתונים. -->
 <script src="catalog.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
 </head>
 
 <body>
 <a class="skip-link" href="#main">דילוג לתוכן המרכזי</a>
 
-<!-- שכבת רקע חיה. קבועה מאחורי כל האתר, מונעת מהגלילה. -->
-<div class="bg-layer" id="bg-layer" aria-hidden="true">
-  <span class="bg-orb bg-orb--1"></span>
-  <span class="bg-orb bg-orb--2"></span>
-  <span class="bg-orb bg-orb--3"></span>
-  <span class="bg-orb bg-orb--4"></span>
-  <span class="bg-grid"></span>
-</div>
-
+<!-- שער גיל -->
 <div class="gate" id="age-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
   <div class="gate__box" id="gate-body">
     <h2 id="gate-title">אישור גיל</h2>
@@ -36,89 +24,141 @@
        ותידרש הצגת תעודה מזהה במעמד המסירה.</p>
     <div class="gate__actions">
       <button class="btn" id="gate-yes" type="button">אני מעל גיל 18</button>
-      <button class="btn btn--soft" id="gate-no" type="button">אני מתחת לגיל 18</button>
+      <button class="btn btn--out" id="gate-no" type="button">אני מתחת לגיל 18</button>
+    </div>
+  </div>
+</div>
+
+<!-- פס עליון -->
+<div class="topbar">
+  <div class="wrap topbar__inner">
+    <span id="top-hours"></span>
+    <span id="top-phone"></span>
+  </div>
+</div>
+
+<!-- כותרת -->
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <button class="cart-pill" id="cart-open" type="button" aria-label="פתיחת סל הקניות">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      <span id="cart-total">₪0</span>
+      <span class="cart-pill__count" id="cart-count" hidden>0</span>
+    </button>
+
+    <a class="brand" href="#main">
+      <span class="brand__mark" id="brand-mark" aria-hidden="true">ח</span>
+      <span>
+        <span class="brand__name" id="brand-name">החנות</span>
+        <span class="brand__sub" id="brand-sub"></span>
+      </span>
+    </a>
+
+    <div class="header-tools">
+      <button class="icon-btn" id="search-open" type="button" aria-label="חיפוש באתר" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="menu-open" type="button" aria-label="פתיחת תפריט הקטגוריות">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- חיפוש -->
+<div class="searchbar" id="searchbar" hidden>
+  <div class="wrap">
+    <div class="search-form">
+      <input type="search" id="search-input" placeholder="חיפוש מוצר או מחלקה" aria-label="חיפוש" autocomplete="off">
+      <button class="btn btn--out" id="search-close" type="button">סגירה</button>
+      <div class="search-suggest" id="search-suggest" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+
+<!-- פס ניווט חום -->
+<nav class="navbar" aria-label="ניווט מהיר">
+  <div class="wrap navbar__inner" id="quicknav"></div>
+</nav>
+
+<!-- תפריט צד -->
+<div class="drawer" id="menu-drawer" role="dialog" aria-modal="true" aria-labelledby="menu-title" hidden>
+  <div class="drawer__back" id="menu-back"></div>
+  <div class="drawer__panel">
+    <div class="drawer__head">
+      <h2 id="menu-title">כל הקטגוריות</h2>
+      <button class="icon-btn" id="menu-close" type="button" aria-label="סגירת התפריט">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer__body" id="menu-list"></div>
+    <div class="drawer__foot">
+      <a class="btn btn--green btn--block" id="menu-wa" href="#" target="_blank" rel="noopener">הזמנה בוואטסאפ</a>
     </div>
   </div>
 </div>
 
 <main id="main">
-
-  <!-- מסך הפתיחה: מפיזור לסדר -->
-  <div class="stage" id="hero-stage">
-    <div class="sticky">
-      <canvas id="hero-canvas" aria-hidden="true"></canvas>
-      <div class="hero-copy">
-        <span class="kicker"><i aria-hidden="true"></i><span id="hero-eyebrow"></span></span>
-        <h1 class="hero-title" id="hero-title"></h1>
-        <p class="hero-lead" id="hero-lead"></p>
-        <div class="hero-actions">
-          <a class="btn" id="hero-cta-1" href="#departments" data-scroll-to="#departments"></a>
-          <a class="btn btn--soft" id="hero-cta-2" href="#" target="_blank" rel="noopener"></a>
-        </div>
+  <div class="hero-strip">
+    <div class="wrap">
+      <h1 id="hero-title">החנות</h1>
+      <p id="hero-lead"></p>
+      <div class="hero-strip__row">
+        <button class="btn" id="hero-cta-1" type="button">לכל הקטגוריות</button>
+        <a class="btn btn--out" id="hero-cta-2" href="#" target="_blank" rel="noopener">הזמנה בוואטסאפ</a>
       </div>
-      <p class="cue">גללו כדי לסדר</p>
     </div>
   </div>
 
-  <div class="strip"><ul id="strip-track"></ul></div>
-
-  <header class="site-header">
-    <div class="wrap site-header__inner">
-      <a class="brand" href="#main">
-        <span class="brand__mark" id="brand-mark" aria-hidden="true">ח</span>
-        <span>
-          <span class="brand__name" id="brand-name">החנות</span>
-          <span class="brand__sub" id="brand-sub"></span>
-        </span>
-      </a>
-      <nav class="site-nav" aria-label="ניווט ראשי">
-        <a href="#departments" data-scroll-to="#departments">מחלקות</a>
-        <a href="#info" data-scroll-to="#info">מידע ותקנון</a>
-      </nav>
-      <a class="btn btn--sm btn--dark" href="#departments" data-scroll-to="#departments">לחנות</a>
+  <!-- תוצאות חיפוש -->
+  <section class="section" id="results-section" hidden>
+    <div class="wrap">
+      <h2 class="section__title" id="results-title"></h2>
+      <div id="results-body"></div>
     </div>
-  </header>
+  </section>
 
   <!-- מחלקות -->
   <section id="departments" aria-labelledby="departments-title">
-    <div class="section section--tight">
-      <div class="wrap reveal">
-        <h2 class="section__title" id="departments-title">מחלקות</h2>
-        <p class="section__lead">כל מחלקה מוצגת בתבנית שמתאימה לה. מחלקות של מוצרי טבק ועישון מוצגות כרשימת פרטים בסיסיים בלבד.</p>
-      </div>
-    </div>
-
     <div class="dept-bar">
       <div class="wrap">
         <div class="dept-tabs" id="dept-tabs" role="tablist" aria-label="מחלקות החנות"></div>
       </div>
     </div>
-
     <div class="section">
-      <div class="wrap" id="dept-panels"></div>
+      <div class="wrap">
+        <h2 class="visually-hidden" id="departments-title">מחלקות</h2>
+        <div id="dept-panels"></div>
+      </div>
     </div>
   </section>
 
   <!-- מידע -->
-  <section class="section section--paper" id="info" aria-labelledby="info-title">
+  <section class="section" id="info" aria-labelledby="info-title">
     <div class="wrap">
-      <div class="reveal">
-        <h2 class="section__title" id="info-title">על העסק, תקנון ונגישות</h2>
-      </div>
+      <h2 class="section__title" id="info-title">על העסק, תקנון ונגישות</h2>
       <div class="info-grid">
-        <article class="info-card reveal">
+        <article class="info-card">
           <h3>על העסק</h3>
           <p id="page-about"></p>
           <dl class="biz-facts" id="biz-facts"></dl>
         </article>
-        <article class="info-card reveal">
+        <article class="info-card">
           <h3>מסמכים ומדיניות</h3>
           <div id="legal-docs"></div>
         </article>
       </div>
     </div>
   </section>
-
 </main>
 
 <footer class="site-footer">
@@ -132,8 +172,8 @@
       <div>
         <h4>ניווט</h4>
         <ul>
-          <li><a href="#departments" data-scroll-to="#departments">מחלקות</a></li>
-          <li><a href="#info" data-scroll-to="#info">מידע ותקנון</a></li>
+          <li><a href="#departments">מחלקות</a></li>
+          <li><a href="#info">מידע ותקנון</a></li>
         </ul>
       </div>
       <div>
@@ -149,32 +189,41 @@
   </div>
 </footer>
 
-<!-- סל ההזמנות -->
-<button class="cart-fab" id="cart-fab" type="button" aria-label="פתיחת הסל">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-    <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L20.5 8H6"/>
-    <circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/>
-  </svg>
-  <span class="cart-fab__count" id="cart-count" hidden>0</span>
-</button>
-
+<!-- סל הקניות -->
 <div class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
-  <div class="cart-backdrop" id="cart-backdrop"></div>
+  <div class="cart-back" id="cart-back"></div>
   <div class="cart-panel">
-    <div class="cart-panel__head">
-      <h2 id="cart-title">הסל שלי</h2>
-      <button class="btn btn--quiet btn--sm" id="cart-close" type="button">סגירה</button>
+    <div class="cart-head">
+      <button class="icon-btn" id="cart-close" type="button" aria-label="סגירת הסל">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+      <h2 id="cart-title">סל הקניות</h2>
+      <button class="icon-btn" id="cart-clear" type="button" aria-label="ריקון הסל">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6"/>
+        </svg>
+      </button>
     </div>
-    <div class="cart-panel__body" data-lenis-prevent>
+    <div class="cart-body" id="cart-body">
       <div id="cart-lines"></div>
-      <div id="cart-form" hidden></div>
+      <div class="wrap" id="cart-form" hidden style="padding-bottom:24px"></div>
+    </div>
+    <div class="cart-foot" id="cart-foot" hidden>
+      <button class="checkout-bar" id="cart-checkout" type="button">המשך לסיום הזמנה</button>
     </div>
   </div>
 </div>
 <p class="visually-hidden" id="cart-live" role="status" aria-live="polite"></p>
 
-<a class="wa-fab" id="wa-fab" href="#" target="_blank" rel="noopener"></a>
-<button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="false">צמצום אנימציות</button>
+<a class="fab fab--wa" id="wa-fab" href="#" target="_blank" rel="noopener" aria-label="שיחה בוואטסאפ"></a>
+<button class="fab fab--a11y" id="a11y-fab" type="button" aria-label="הגדרות נגישות">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <circle cx="12" cy="4.5" r="1.8" fill="currentColor" stroke="none"/>
+    <path d="M4 8.5h16"/><path d="M9 8.5v4l-2 8"/><path d="M15 8.5v4l2 8"/>
+  </svg>
+</button>
 
 <script type="module" src="./app.js"></script>
 </body>
