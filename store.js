@@ -146,17 +146,26 @@ function baseData() {
 }
 
 /** מיזוג עם ברירת המחדל, כדי ששדות חדשים לא ישברו נתונים ישנים. */
+/** מוודא שלכל מוצר יש מערך תמונות, גם אם נשמר במבנה הישן. */
+function normalize(data) {
+  data.products.forEach(p => {
+    if (!Array.isArray(p.images)) p.images = p.image ? [p.image] : [];
+    p.images = p.images.filter(Boolean);
+  });
+  return data;
+}
+
 function withDefaults(raw) {
   const d = baseData();
-  if (!raw || typeof raw !== 'object') return d;
-  return {
+  if (!raw || typeof raw !== 'object') return normalize(d);
+  return normalize({
     business:    Object.assign(d.business, raw.business || {}),
     hero:        Object.assign(d.hero,     raw.hero     || {}),
     pages:       Object.assign(d.pages,    raw.pages    || {}),
     settings:    mergeSettings(d.settings, raw.settings),
     departments: Array.isArray(raw.departments) ? raw.departments : d.departments,
     products:    Array.isArray(raw.products)    ? raw.products    : d.products
-  };
+  });
 }
 
 const Store = {
@@ -189,6 +198,34 @@ const Store = {
   keys: { STORAGE_KEY, GATE_KEY, MOTION_KEY }
 };
 
+
+/**
+ * רשימת התמונות של מוצר.
+ *
+ * המבנה הישן החזיק תמונה אחת בשדה image. המבנה החדש מחזיק מערך בשדה
+ * images. הפונקציה מחזירה תמיד מערך, כך שקוד התצוגה לא צריך לדעת
+ * באיזה מבנה נשמר המוצר, וקטלוג ישן ממשיך לעבוד.
+ */
+function imagesOf(p) {
+  if (Array.isArray(p.images)) return p.images.filter(Boolean);
+  return p.image ? [p.image] : [];
+}
+
+/** האם המוצר אזל. שדה stock בערך out. */
+function isOut(p) { return p.stock === 'out'; }
+
+/**
+ * מיון תצוגה: מוצרים שאזלו יורדים לתחתית הרשימה, ובתוך כל קבוצה
+ * נשמר הסדר שנקבע בפאנל.
+ */
+function displayOrder(list) {
+  return [...list].sort((a, b) => {
+    const ao = isOut(a) ? 1 : 0, bo = isOut(b) ? 1 : 0;
+    if (ao !== bo) return ao - bo;
+    return (a.order || 0) - (b.order || 0);
+  });
+}
+
 /** תצוגת מחיר בשקלים, בלי שברים מיותרים. */
 function money(value) {
   const n = Number(value || 0);
@@ -201,7 +238,7 @@ function money(value) {
 
 /** תווית זמינות אחידה. status הוא in או low או out. */
 function stockLabel(status) {
-  if (status === 'out') return 'אזל מהמלאי';
+  if (status === 'out') return 'אזל זמנית מהמלאי';
   if (status === 'low') return 'מלאי מוגבל';
   return 'במלאי';
 }
@@ -219,4 +256,4 @@ function esc(str) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-export { Store, money, stockLabel, waLink, esc };
+export { Store, money, stockLabel, waLink, esc, imagesOf, isOut, displayOrder };

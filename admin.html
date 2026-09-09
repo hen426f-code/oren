@@ -8,7 +8,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <script src="catalog.js"></script>
@@ -21,10 +21,10 @@
     <div class="wrap admin-top__inner">
       <h1>פאנל ניהול</h1>
       <div class="admin-top__actions">
-        <a class="btn btn--soft btn--sm" href="index.html">צפייה באתר</a>
-        <button class="btn btn--soft btn--sm" id="act-publish" type="button">ייצוא קובץ אתר</button>
-        <button class="btn btn--soft btn--sm" id="act-export" type="button">ייצוא גיבוי</button>
-        <button class="btn btn--soft btn--sm" id="act-import" type="button">ייבוא גיבוי</button>
+        <a class="btn btn--out btn--sm" href="index.html">צפייה באתר</a>
+        <button class="btn btn--out btn--sm" id="act-publish" type="button">ייצוא קובץ אתר</button>
+        <button class="btn btn--out btn--sm" id="act-export" type="button">ייצוא גיבוי</button>
+        <button class="btn btn--out btn--sm" id="act-import" type="button">ייבוא גיבוי</button>
         <input type="file" id="import-file" accept="application/json" hidden>
       </div>
     </div>
@@ -78,7 +78,7 @@
         <div id="settings-form"></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap">
           <button class="btn" id="act-save-settings" type="button">שמירת ההגדרות</button>
-          <button class="btn btn--danger" id="act-reset" type="button">איפוס לנתוני ברירת המחדל</button>
+          <button class="btn btn--red" id="act-reset" type="button">איפוס לנתוני ברירת המחדל</button>
         </div>
       </section>
 
@@ -90,12 +90,12 @@
   <div class="modal__box">
     <div class="modal__head">
       <h2 id="modal-title">עריכה</h2>
-      <button class="btn btn--quiet btn--sm" id="modal-close" type="button">סגירה</button>
+      <button class="btn btn--out btn--sm" id="modal-close" type="button">סגירה</button>
     </div>
     <div id="modal-body"></div>
     <div class="modal__foot">
       <button class="btn" id="modal-save" type="button">שמירה</button>
-      <button class="btn btn--soft" id="modal-cancel" type="button">ביטול</button>
+      <button class="btn btn--out" id="modal-cancel" type="button">ביטול</button>
     </div>
   </div>
 </div>
